@@ -68,8 +68,8 @@ with st.sidebar:
 
 # ── Route ─────────────────────────────────────────────────────────────────────
 if page == "🗺️ Dashboard":
-    from pages import dashboard
+    import dashboard
     dashboard.render()
 else:
-    from pages import entry
+    import entry
     entry.render()
