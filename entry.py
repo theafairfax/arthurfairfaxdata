@@ -13,7 +13,7 @@ import streamlit as st
 import sheets
 import xp as xp_utils
 from cal import fetch_today_domain_minutes
-from utils.xp import DOMAIN_LABELS, DOMAIN_ICONS, ALL_DOMAINS
+from xp import DOMAIN_LABELS, DOMAIN_ICONS, ALL_DOMAINS
 
 
 # ── Session state helpers ──────────────────────────────────────────────────────
