@@ -12,7 +12,7 @@ import streamlit as st
 
 import sheets
 import xp as xp_utils
-from utils.calendar import fetch_today_domain_minutes
+from cal import fetch_today_domain_minutes
 from utils.xp import DOMAIN_LABELS, DOMAIN_ICONS, ALL_DOMAINS
 
 
