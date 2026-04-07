@@ -8,8 +8,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from utils import sheets
-from utils.xp import domain_level_info, DOMAIN_LABELS, DOMAIN_ICONS, ALL_DOMAINS
+import sheets
+from xp import domain_level_info, DOMAIN_LABELS, DOMAIN_ICONS, ALL_DOMAINS
 
 
 # ── Data loading ───────────────────────────────────────────────────────────────
