@@ -22,7 +22,7 @@ DOMAIN_KEYWORDS: dict[str, list[str]] = {
     "gardening":      ["garden", "plant", "prune", "harvest", "compost", "seed"],
     "cooking":        ["cook", "meal prep", "bake", "recipe", "kitchen"],
     "art_criticism":  ["letterboxd", "storygraph", "yelp", "musicboard", "review", "film", "movie", "book club"],
-    "autodidactic":   ["study", "read", "course", "book", "essay", "lecture"],
+    "autodidactic": ["study", "read", "course", "book", "essay", "lecture", "autodidactic"],
     "languages":      ["spanish", "french", "german", "japanese", "mandarin", "duolingo", "anki", "language"],
 }
 
@@ -81,8 +81,9 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
     Falls back to zeros if Calendar is unreachable.
     """
     target = target_date or date.today()
-    start = datetime(target.year, target.month, target.day, tzinfo=timezone.utc).isoformat()
-    end   = datetime(target.year, target.month, target.day, 23, 59, 59, tzinfo=timezone.utc).isoformat()
+    TZ = timezone(timedelta(hours=-6))
+    start = datetime(target.year, target.month, target.day, 0, 0, 0, tzinfo=TZ).isoformat()
+    end   = datetime(target.year, target.month, target.day, 23, 59, 59, tzinfo=TZ).isoformat()
 
     domain_minutes: dict[str, int] = {k: 0 for k in DOMAIN_KEYWORDS}
 
