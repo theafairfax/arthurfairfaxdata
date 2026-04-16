@@ -101,6 +101,11 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
             maxResults=50,
         ).execute()
 
+        events = events_result.get("items", [])
+        st.write(f"DEBUG: Found {len(events)} events")
+        for event in events:
+            st.write(f"DEBUG event: {event.get('summary')} | start: {event.get('start')}")
+
         for event in events_result.get("items", []):
             summary = (event.get("summary") or "").lower()
             description = (event.get("description") or "").lower()
@@ -126,8 +131,3 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
         st.warning(f"Could not fetch Calendar events: {e}")
 
     return domain_minutes
-
-events = events_result.get("items", [])
-st.write(f"DEBUG: Found {len(events)} events")
-for event in events:
-    st.write(f"DEBUG event: {event.get('summary')} | start: {event.get('start')}")
