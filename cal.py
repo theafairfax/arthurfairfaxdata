@@ -5,7 +5,7 @@ to tracker domains by keyword matching.
 import json
 import os
 import pickle
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
 
