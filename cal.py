@@ -80,7 +80,9 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
     Returns a dict mapping domain name → total minutes from Google Calendar events today.
     Falls back to zeros if Calendar is unreachable.
     """
-    target = date(2026, 4, 16)  # hardcoded for debugging
+    TZ = timezone(timedelta(hours=-6))
+    today_utc = datetime.now(timezone.utc)
+    target = target_date or today_utc.astimezone(TZ).date()
     TZ = timezone(timedelta(hours=-6))
     start = datetime(target.year, target.month, target.day, 0, 0, 0, tzinfo=TZ).isoformat()
     end   = datetime(target.year, target.month, target.day, 23, 59, 59, tzinfo=TZ).isoformat()
@@ -100,12 +102,6 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
             orderBy="startTime",
             maxResults=50,
         ).execute()
-
-        events = events_result.get("items", [])
-        st.write(f"DEBUG: Found {len(events)} events")
-        st.write(f"DEBUG: Query window — start: {start}, end: {end}")
-        for event in events:
-            st.write(f"DEBUG event: {event.get('summary')} | start: {event.get('start')}")
 
         for event in events_result.get("items", []):
             summary = (event.get("summary") or "").lower()
