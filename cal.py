@@ -5,7 +5,8 @@ to tracker domains by keyword matching.
 import json
 import os
 import pickle
-from datetime import date, datetime, timezone, timedelta
+from datetime import date
+target = date(2026, 4, 16)  # hardcode today
 from pathlib import Path
 from typing import Optional
 
@@ -103,6 +104,7 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
 
         events = events_result.get("items", [])
         st.write(f"DEBUG: Found {len(events)} events")
+        st.write(f"DEBUG: Query window — start: {start}, end: {end}")
         for event in events:
             st.write(f"DEBUG event: {event.get('summary')} | start: {event.get('start')}")
 
