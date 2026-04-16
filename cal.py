@@ -5,8 +5,7 @@ to tracker domains by keyword matching.
 import json
 import os
 import pickle
-from datetime import date
-target = date(2026, 4, 16)  # hardcode today
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -81,7 +80,7 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
     Returns a dict mapping domain name → total minutes from Google Calendar events today.
     Falls back to zeros if Calendar is unreachable.
     """
-    target = target_date or date.today()
+    target = date(2026, 4, 16)  # hardcoded for debugging
     TZ = timezone(timedelta(hours=-6))
     start = datetime(target.year, target.month, target.day, 0, 0, 0, tzinfo=TZ).isoformat()
     end   = datetime(target.year, target.month, target.day, 23, 59, 59, tzinfo=TZ).isoformat()
