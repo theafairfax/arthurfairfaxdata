@@ -93,7 +93,7 @@ def fetch_today_domain_minutes(target_date: Optional[date] = None) -> dict[str, 
 
     try:
         events_result = service.events().list(
-            calendarId="primary",
+            calendarId="theafairfax@gmail.com",
             timeMin=start,
             timeMax=end,
             singleEvents=True,
