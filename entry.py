@@ -10,6 +10,8 @@ from datetime import date, datetime, time
 
 import streamlit as st
 
+from chess_api import fetch_today_chess_stats
+
 import sheets
 import xp as xp_utils
 from cal import fetch_today_domain_minutes
@@ -141,20 +143,29 @@ def _step3():
     # ── Chess ──────────────────────────────────────────────────────────────────
     if "chess" in active_domains:
         with st.expander("♟️ Chess", expanded=True):
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                wins   = st.number_input("Wins",   min_value=0, key="chess_w")
-                losses = st.number_input("Losses", min_value=0, key="chess_l")
-                draws  = st.number_input("Draws",  min_value=0, key="chess_d")
-            with c2:
-                current_rating = st.number_input("Current Rating", min_value=0, key="chess_cr")
-                best_rating    = st.number_input("Best Rating",    min_value=0, key="chess_br")
-            with c3:
-                goal_rating = st.number_input("Goal Rating", min_value=0, key="chess_gr")
-            domain_data["chess"] = dict(
-                wins=wins, losses=losses, draws=draws,
-                current_rating=current_rating, best_rating=best_rating, goal_rating=goal_rating,
-            )
+            # Auto-fetch from Chess.com
+            if "chess_api_data" not in st.session_state:
+                with st.spinner("Fetching Chess.com stats…"):
+                    st.session_state.chess_api_data = fetch_today_chess_stats()
+            api = st.session_state.chess_api_data
+
+            if api["games_today"] > 0:
+                st.caption(f"♟️ Found {api['games_today']} game(s) today on Chess.com — pre-filled below.")
+
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            wins   = st.number_input("Wins",   min_value=0, value=api["wins"],   key="chess_w")
+            losses = st.number_input("Losses", min_value=0, value=api["losses"], key="chess_l")
+            draws  = st.number_input("Draws",  min_value=0, value=api["draws"],  key="chess_d")
+        with c2:
+            current_rating = st.number_input("Current Rating", min_value=0, value=api["current_rating"], key="chess_cr")
+            best_rating    = st.number_input("Best Rating",    min_value=0, value=api["best_rating"],    key="chess_br")
+        with c3:
+            goal_rating = st.number_input("Goal Rating", min_value=0, key="chess_gr")
+        domain_data["chess"] = dict(
+            wins=wins, losses=losses, draws=draws,
+            current_rating=current_rating, best_rating=best_rating, goal_rating=goal_rating,
+        )
 
     # ── Fitness ────────────────────────────────────────────────────────────────
     if "fitness" in active_domains:
