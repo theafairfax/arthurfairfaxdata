@@ -318,22 +318,24 @@ def _step3():
     # ── Finance ────────────────────────────────────────────────────────────────
     if "finance" in active_domains:
         with st.expander("💰 Personal Finance", expanded=True):
+            if "ynab_data" not in st.session_state:
+                with st.spinner("Fetching YNAB data…"):
+                    st.session_state.ynab_data = fetch_finance_snapshot()
+            api = st.session_state.ynab_data
+
+            st.caption(f"💰 YNAB snapshot — income this month: ${api['monthly_income']:,.2f} · "
+                   f"savings rate: {api['savings_rate_pct']:.1f}%")
+
             c1, c2 = st.columns(2)
             with c1:
-                savings_rate = st.number_input("Savings Rate %", min_value=0.0, max_value=100.0, format="%.1f", key="fin_sr")
-            with c2:
-                net_worth = st.number_input("Net Worth ($)", min_value=0.0, format="%.2f", key="fin_nw")
-            domain_data["finance"] = dict(savings_rate_pct=savings_rate, net_worth=net_worth)
-
-    st.markdown("---")
-    col_back, col_submit = st.columns([1, 3])
-    with col_back:
-        if st.button("← Back"):
-            _prev_step()
-            st.rerun()
-    with col_submit:
-        if st.button("✅ Submit Entry", use_container_width=True, type="primary"):
-            _submit(domain_data)
+                savings_rate = st.number_input("Savings Rate %",
+                    min_value=0.0, max_value=100.0, format="%.1f",
+                    value=float(api["savings_rate_pct"]), key="fin_sr")
+        with c2:
+            net_worth = st.number_input("Net Worth ($)",
+                min_value=0.0, format="%.2f",
+                value=float(api["net_worth"]), key="fin_nw")
+        domain_data["finance"] = dict(savings_rate_pct=savings_rate, net_worth=net_worth)
 
 
 def _submit(domain_data: dict):
