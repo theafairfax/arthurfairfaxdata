@@ -153,7 +153,7 @@ def render():
         height=420,
         margin=dict(l=60, r=60, t=30, b=30),
     )
-    st.plotly_chart(fig_radar, use_container_width=True, key="radar_chart")
+    st.plotly_chart(fig_radar, width='stretch', key="radar_chart")
 
     # ── 30-day time heatmap ───────────────────────────────────────────────────
     st.markdown("---")
@@ -169,7 +169,7 @@ def render():
         with cols[i % 3]:
             st.caption(f"{DOMAIN_ICONS[domain]} {DOMAIN_LABELS[domain]}")
             if fig:
-                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False}, key=f"sparkline_{i}_{domain}")
+                st.plotly_chart(fig, width='stretch', config={"displayModeBar": False}, key=f"sparkline_{i}_{domain}")
 
     # ── Chess-specific stats ───────────────────────────────────────────────────
     _domain_detail_section()
