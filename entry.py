@@ -331,11 +331,11 @@ def _step3():
                 savings_rate = st.number_input("Savings Rate %",
                     min_value=0.0, max_value=100.0, format="%.1f",
                     value=float(api["savings_rate_pct"]), key="fin_sr")
-        with c2:
-            net_worth = st.number_input("Net Worth ($)",
-                min_value=0.0, format="%.2f",
-                value=float(api["net_worth"]), key="fin_nw")
-        domain_data["finance"] = dict(savings_rate_pct=savings_rate, net_worth=net_worth)
+            with c2:
+                net_worth = st.number_input("Net Worth ($)",
+                    min_value=0.0, format="%.2f",
+                    value=float(api["net_worth"]), key="fin_nw")
+            domain_data["finance"] = dict(savings_rate_pct=savings_rate, net_worth=net_worth)
 
 
 def _submit(domain_data: dict):
@@ -384,7 +384,17 @@ def _submit(domain_data: dict):
             st.error(f"Error writing to Google Sheets: {e}")
             st.info("Check your secrets.toml and Sheet permissions.")
 
-
+# ── Navigation ────────────────────────────────────────────────────────────
+    st.markdown("---")
+    col_back, col_fwd = st.columns([1, 3])
+    with col_back:
+        if st.button("← Back"):
+            _prev_step()
+            st.rerun()
+    with col_fwd:
+        if st.button("✅ Submit Entry", use_container_width=True):
+            _submit(domain_data)
+            
 # ── Main render ────────────────────────────────────────────────────────────────
 
 def render():
