@@ -337,6 +337,17 @@ def _step3():
                     value=float(api["net_worth"]), key="fin_nw")
             domain_data["finance"] = dict(savings_rate_pct=savings_rate, net_worth=net_worth)
 
+    # ── Navigation ────────────────────────────────────────────────────────────
+    st.markdown("---")
+    col_back, col_fwd = st.columns([1, 3])
+    with col_back:
+        if st.button("← Back"):
+            _prev_step()
+            st.rerun()
+    with col_fwd:
+        if st.button("✅ Submit Entry", use_container_width=True):
+            _submit(domain_data)
+
 
 def _submit(domain_data: dict):
     today = str(date.today())
@@ -384,17 +395,7 @@ def _submit(domain_data: dict):
             st.error(f"Error writing to Google Sheets: {e}")
             st.info("Check your secrets.toml and Sheet permissions.")
 
-# ── Navigation ────────────────────────────────────────────────────────────
-    st.markdown("---")
-    col_back, col_fwd = st.columns([1, 3])
-    with col_back:
-        if st.button("← Back"):
-            _prev_step()
-            st.rerun()
-    with col_fwd:
-        if st.button("✅ Submit Entry", use_container_width=True):
-            _submit(domain_data)
-            
+
 # ── Main render ────────────────────────────────────────────────────────────────
 
 def render():
