@@ -169,7 +169,7 @@ def render():
         with cols[i % 3]:
             st.caption(f"{DOMAIN_ICONS[domain]} {DOMAIN_LABELS[domain]}")
             if fig:
-                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False}, key=f"sparkline_{i}_{domain}"
+                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False}, key=f"sparkline_{i}_{domain}")
 
     # ── Chess-specific stats ───────────────────────────────────────────────────
     _domain_detail_section()
