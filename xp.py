@@ -51,7 +51,6 @@ def domain_level_info(domain: str, total_minutes: int) -> LevelInfo:
 DOMAIN_ICONS: dict[str, str] = {
     "chess":         "♟️",
     "fitness":       "🏋️",
-    "finance":       "💰",
     "research":      "🔬",
     "music":         "🎵",
     "visual_arts":   "🎨",
@@ -65,7 +64,6 @@ DOMAIN_ICONS: dict[str, str] = {
 DOMAIN_LABELS: dict[str, str] = {
     "chess":         "Chess",
     "fitness":       "Fitness",
-    "finance":       "Personal Finance",
     "research":      "Scientific Research",
     "music":         "Music",
     "visual_arts":   "Visual Arts",
