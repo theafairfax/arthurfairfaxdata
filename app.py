@@ -5,7 +5,7 @@ Navigation: Dashboard | Daily Entry
 import streamlit as st
 
 st.set_page_config(
-    page_title="Life Tracker",
+    page_title="Arthur Fairfax",
     page_icon="⚔️",
     layout="wide",
     initial_sidebar_state="expanded",
