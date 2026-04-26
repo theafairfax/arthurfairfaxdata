@@ -230,7 +230,7 @@ def _domain_detail_section():
     st.markdown("---")
     st.markdown("### Domain Records")
 
-    tab_labels = ["♟️ Chess", "💰 Finance", "🔬 Research", "🎵 Music", "🎨 Visual Arts",
+    tab_labels = ["♟️ Chess", "🔬 Research", "🎵 Music", "🎨 Visual Arts",
                   "🌐 Languages", "🎭 Criticism", "📚 Autodidactic", "🌱 Garden", "🍳 Cooking", "🏋️ Fitness"]
     tab_keys   = [sheets.TAB_CHESS, sheets.TAB_FINANCE, sheets.TAB_RESEARCH, sheets.TAB_MUSIC,
                   sheets.TAB_ARTS, sheets.TAB_LANG, sheets.TAB_CRITIC, sheets.TAB_AUTODID,
