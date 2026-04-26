@@ -1,8 +1,8 @@
 """
-pages/entry.py — 3-step daily data entry flow.
+pages/entry.py — Arthur Fairfax · 3-step daily data entry flow.
 Step 1: Sleep / Supplements / Routines
 Step 2: Time per domain (pre-filled from Google Calendar)
-Step 3: Domain-specific metrics
+Step 3: Arete — Domain-specific metrics & cultural consumption
 """
 from __future__ import annotations
 
@@ -129,7 +129,7 @@ def _step2():
 
 
 def _step3():
-    st.markdown("## Step 3 of 3 — Domain Metrics")
+    st.markdown("## Step 3 of 3 — Arete")
     st.markdown("*Log accomplishments for any domain you engaged with today.*")
     st.markdown("---")
 
@@ -337,6 +337,64 @@ def _step3():
                     value=float(api["net_worth"]), key="fin_nw")
             domain_data["finance"] = dict(savings_rate_pct=savings_rate, net_worth=net_worth)
 
+    # ── Cultural Consumption ───────────────────────────────────────────────────
+    with st.expander("🎬 Cultural Consumption", expanded=True):
+        st.markdown("*Select all kinds of cultural products consumed today.*")
+
+        CULTURAL_TYPES = {
+            "film":       ("🎬", "Film",        "Title of film watched"),
+            "tv":         ("📺", "TV Series",   "Title of series watched"),
+            "book":       ("📖", "Book",        "Title of book read"),
+            "music":      ("🎵", "Music",       "Artist / album / song listened to"),
+            "restaurant": ("🍽️", "Restaurant",  "Name of restaurant visited"),
+        }
+
+        selected_types = st.multiselect(
+            "Select all kinds of cultural products consumed today",
+            options=list(CULTURAL_TYPES.keys()),
+            format_func=lambda k: f"{CULTURAL_TYPES[k][0]} {CULTURAL_TYPES[k][1]}",
+            key="cult_types",
+        )
+
+        cultural_entries: list[dict] = []
+
+        for ct in selected_types:
+            icon, label, placeholder = CULTURAL_TYPES[ct]
+            st.markdown(f"**{icon} {label}**")
+
+            # Allow multiple entries per type
+            if f"cult_{ct}_count" not in st.session_state:
+                st.session_state[f"cult_{ct}_count"] = 1
+
+            for idx in range(st.session_state[f"cult_{ct}_count"]):
+                c1, c2 = st.columns([3, 1])
+                with c1:
+                    title = st.text_input(
+                        f"Title #{idx + 1}",
+                        placeholder=placeholder,
+                        key=f"cult_{ct}_{idx}_title",
+                        label_visibility="collapsed",
+                    )
+                with c2:
+                    reviewed = st.selectbox(
+                        "Review left?",
+                        ["No", "Yes"],
+                        key=f"cult_{ct}_{idx}_reviewed",
+                        label_visibility="collapsed",
+                    )
+                if title:
+                    cultural_entries.append({
+                        "type": label,
+                        "title": title,
+                        "review_left": reviewed,
+                    })
+
+            if st.button(f"+ Add another {label}", key=f"cult_{ct}_add"):
+                st.session_state[f"cult_{ct}_count"] += 1
+                st.rerun()
+
+            st.markdown("")
+
     # ── Navigation ────────────────────────────────────────────────────────────
     st.markdown("---")
     col_back, col_fwd = st.columns([1, 3])
@@ -346,10 +404,10 @@ def _step3():
             st.rerun()
     with col_fwd:
         if st.button("✅ Submit Entry", use_container_width=True):
-            _submit(domain_data)
+            _submit(domain_data, cultural_entries)
 
 
-def _submit(domain_data: dict):
+def _submit(domain_data: dict, cultural_entries: list | None = None):
     today = str(date.today())
     s1 = st.session_state.step1_data
     s2 = st.session_state.step2_data
@@ -367,6 +425,15 @@ def _submit(domain_data: dict):
             for domain in ALL_DOMAINS:
                 daily_row[f"{domain}_min"] = s2.get(domain, 0)
             sheets.write_daily(daily_row)
+
+            # Cultural consumption rows
+            if cultural_entries:
+                for entry in cultural_entries:
+                    sheets.write_domain(
+                        sheets.TAB_CULTURAL,
+                        ["date", "type", "title", "review_left"],
+                        {"date": today, **entry},
+                    )
 
             # Domain-specific rows
             tab_map = {
@@ -403,7 +470,7 @@ def render():
 
     # Progress indicator
     step = st.session_state.entry_step
-    progress_labels = ["1 · Sleep & Health", "2 · Time Logged", "3 · Domain Metrics"]
+    progress_labels = ["1 · Sleep & Health", "2 · Time Logged", "3 · Arete"]
     cols = st.columns(3)
     for i, label in enumerate(progress_labels):
         with cols[i]:
