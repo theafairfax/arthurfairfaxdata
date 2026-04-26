@@ -56,18 +56,18 @@ div[data-testid="stSidebar"] {
 
 # ── Sidebar navigation ─────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## ⚔️ Life Tracker")
+    st.markdown("## ⚔️ Arthur Fairfax")
     st.markdown("---")
     page = st.radio(
         "Navigate",
-        ["🗺️ Dashboard", "📋 Daily Entry"],
+        ["🗺️ Arete", "📋 Daily Entry"],
         label_visibility="collapsed",
     )
     st.markdown("---")
     st.caption("Data lands in your Google Sheet.\nXP = hours logged since inception.")
 
 # ── Route ─────────────────────────────────────────────────────────────────────
-if page == "🗺️ Dashboard":
+if page == "🗺️ Arete":
     import dashboard
     dashboard.render()
 else:
