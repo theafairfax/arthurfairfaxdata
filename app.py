@@ -60,7 +60,7 @@ with st.sidebar:
     st.markdown("---")
     page = st.radio(
         "Navigate",
-        ["🗺️ Arete", "📋 Daily Entry"],
+        ["🗺️ Arete", "📋 Daily Entry", "📜 Curriculum Vitae"],
         label_visibility="collapsed",
     )
     st.markdown("---")
@@ -70,6 +70,9 @@ with st.sidebar:
 if page == "🗺️ Arete":
     import dashboard
     dashboard.render()
+elif page == "📜 Curriculum Vitae":
+    import cv
+    cv.render()
 else:
     import entry
     entry.render()
