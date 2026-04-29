@@ -107,7 +107,9 @@ def _achievement_card(row: pd.Series):
     collab_html = (
         f'<div style="color:#666;font-size:0.72rem;margin-top:4px;font-style:italic;">'
         f'with {collabs}</div>'
-        if collabs and collabs not in ("", "nan") else ""
+        if collabs and collabs not in ("", "nan") else
+        '<div style="color:#444;font-size:0.72rem;margin-top:4px;font-style:italic;">solo</div>'
+)
     )
 
     st.markdown(f"""
