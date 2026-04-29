@@ -85,7 +85,7 @@ def _achievement_card(row: pd.Series):
     domain  = str(row.get("Production Domain", "")).strip()
     ptype   = str(row.get("Production Type", "")).strip()
     title   = str(row.get("Title", "")).strip()
-    desc    = str(row.get("Description", "")).strip()
+    desc    = str(row.get("Description", "")).strip().replace("`", "'").replace("\n", " ")
     date    = str(row.get("Date Acquired", "")).strip()
     link    = str(row.get("Link", "")).strip()
     score   = float(row.get("Impact Score", 1))
