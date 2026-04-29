@@ -82,26 +82,31 @@ def compute_momentum(df: pd.DataFrame, domain: str) -> tuple[float, int]:
 
 def _momentum_indicator(intensity: float, consistency: int) -> str:
     """
-    Returns an HTML snippet: a 🚗 emoji rendered with a color + opacity
-    that encodes consistency (color: red→green) and intensity (opacity: dim→bright).
+    Returns an HTML snippet: a car emoji where:
+      - Size   grows with consistency (0/5 = tiny 0.6rem -> 5/5 = large 1.8rem)
+      - Color  red->green based on consistency
+      - Opacity dim->bright based on intensity
     """
-    # Consistency color: 0/5 = dull red, 5/5 = vivid green
-    # Interpolate in RGB: (120,30,30) → (30,160,60)
     t = consistency / 5.0
+
+    # Size: 0.6rem at 0 days -> 1.8rem at 5 days
+    font_size = 0.6 + t * 1.2
+
+    # Color: dull red (120,30,30) -> vivid green (30,160,60)
     r = int(120 + t * (30  - 120))
     g = int(30  + t * (160 - 30))
     b = int(30  + t * (60  - 30))
 
-    # Intensity → opacity: min 0.15 so the icon is always faintly visible
+    # Intensity -> opacity: min 0.15 so icon is always faintly visible
     opacity = 0.15 + intensity * 0.85
 
     color = f"rgba({r},{g},{b},{opacity:.2f})"
-    # Outer glow to make bright states pop
-    glow  = f"0 0 6px rgba({r},{g},{b},{min(1.0, opacity * 0.8):.2f})"
+    glow_size = int(4 + t * 6)
+    glow  = f"0 0 {glow_size}px rgba({r},{g},{b},{min(1.0, opacity * 0.8):.2f})"
 
     return (
-        f'<span style="font-size:1.1rem;filter:drop-shadow({glow});'
-        f'color:{color};display:inline-block;" '
+        f'<span style="font-size:{font_size:.2f}rem;filter:drop-shadow({glow});'
+        f'color:{color};display:inline-block;line-height:1;" '
         f'title="Momentum: {consistency}/5 days active | intensity {intensity:.0%}">🚗</span>'
     )
 
