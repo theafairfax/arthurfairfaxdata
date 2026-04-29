@@ -110,8 +110,6 @@ def _achievement_card(row: pd.Series):
         if collabs and collabs not in ("", "nan") else
         '<div style="color:#444;font-size:0.72rem;margin-top:4px;font-style:italic;">solo</div>'
 )
-)
-    )
 
     st.markdown(f"""
 <div style="
