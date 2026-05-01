@@ -47,16 +47,15 @@ def domain_level_info(domain: str, total_minutes: int) -> LevelInfo:
         progress_pct=round(progress_pct, 1),
     )
 
-
 DOMAIN_ICONS: dict[str, str] = {
     "chess":         "♟️",
     "fitness":       "🏋️",
     "research":      "🔬",
     "music":         "🎵",
     "visual_arts":   "🎨",
-    "gardening":     "🌱",
+    "industrial":    "⚙️", # Replaced gardening
     "cooking":       "🍳",
-    "art_criticism": "🎭",
+    "framework":     "👼", # Added (Angel emoji)
     "autodidactic":  "📚",
     "languages":     "🌐",
 }
@@ -67,9 +66,9 @@ DOMAIN_LABELS: dict[str, str] = {
     "research":      "Scientific Research",
     "music":         "Music",
     "visual_arts":   "Visual Arts",
-    "gardening":     "Gardening",
+    "industrial":    "Industrial", # Replaced Gardening
     "cooking":       "Cooking",
-    "art_criticism": "Art Criticism",
+    "framework":     "Framework", # Added
     "autodidactic":  "Autodidactic Studies",
     "languages":     "Languages",
 }
