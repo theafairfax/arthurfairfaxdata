@@ -89,9 +89,15 @@ def write_daily(data: dict) -> None:
     ws.append_row(row, value_input_option="USER_ENTERED")
 
 
+# sheets.py
+
 def write_domain(tab_name: str, headers: list[str], data: dict) -> None:
     ss = get_spreadsheet()
-    ws = get_or_create_tab(ss, tab_name)
+    # Ensure the worksheet is defined as 'ws'
+    ws = get_or_create_tab(ss, tab_name) 
+    
+    # Now ws is defined and can be passed to ensure_header
     ensure_header(ws, ["date"] + headers)
+    
     row = [str(date.today())] + [data.get(h, "") for h in headers]
     ws.append_row(row, value_input_option="USER_ENTERED")
