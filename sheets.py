@@ -20,15 +20,14 @@ TAB_CV       = "Main Tab"      # ← CV sheet tab name — update if yours diffe
 TAB_CULTURAL = "Cultural"
 TAB_CHESS    = "Chess"
 TAB_FITNESS = "Fitness"
-TAB_FINANCE = "Finance"
 TAB_RESEARCH= "Research"
 TAB_MUSIC   = "Music"
 TAB_ARTS    = "VisualArts"
-TAB_GARDEN  = "Gardening"
 TAB_COOKING = "Cooking"
-TAB_CRITIC  = "ArtCriticism"
 TAB_AUTODID = "Autodidactic"
 TAB_LANG    = "Languages"
+TAB_INDUSTRIAL = "Industrial" # Replaced TAB_GARDEN
+TAB_FRAMEWORK  = "Framework"  # Added
 
 
 @st.cache_resource(show_spinner=False)
@@ -77,14 +76,14 @@ def read_all(tab_name: str) -> list[dict]:
 # ── High-level write helpers ───────────────────────────────────────────────────
 
 def write_daily(data: dict) -> None:
-    ss = get_spreadsheet()
-    ws = get_or_create_tab(ss, TAB_DAILY)
+    # ... inside write_daily ...
     headers = [
         "date", "sleep_hours", "supplements", "morning_routine", "nightly_routine",
         "chess_min", "fitness_min", "research_min", "music_min",
-        "visual_arts_min", "gardening_min", "cooking_min", "art_criticism_min",
-        "autodidactic_min", "languages_min",
+        "visual_arts_min", "industrial_min", "cooking_min", # Changed gardening to industrial
+        "autodidactic_min", "languages_min", "framework_min" # Added framework, removed art_criticism
     ]
+    
     ensure_header(ws, headers)
     row = [data.get(h, "") for h in headers]
     ws.append_row(row, value_input_option="USER_ENTERED")
