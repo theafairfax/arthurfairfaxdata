@@ -76,14 +76,18 @@ def read_all(tab_name: str) -> list[dict]:
 # ── High-level write helpers ───────────────────────────────────────────────────
 
 def write_daily(data: dict) -> None:
-    # ... inside write_daily ...
+    ss = get_spreadsheet()
+    # ADD THIS LINE: Define the worksheet 'ws' before using it below
+    ws = get_or_create_tab(ss, TAB_DAILY)
+    
     headers = [
         "date", "sleep_hours", "supplements", "morning_routine", "nightly_routine",
         "chess_min", "fitness_min", "research_min", "music_min",
-        "visual_arts_min", "industrial_min", "cooking_min", # Changed gardening to industrial
-        "autodidactic_min", "languages_min", "framework_min" # Added framework, removed art_criticism
+        "visual_arts_min", "industrial_min", "cooking_min",
+        "autodidactic_min", "languages_min", "framework_min"
     ]
     
+    # Now 'ws' is defined and can be passed to ensure_header
     ensure_header(ws, headers)
     row = [data.get(h, "") for h in headers]
     ws.append_row(row, value_input_option="USER_ENTERED")
