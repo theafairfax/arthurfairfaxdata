@@ -12,17 +12,17 @@ from typing import Optional
 import streamlit as st
 
 # Domain keyword mapping — extend freely
+
 DOMAIN_KEYWORDS: dict[str, list[str]] = {
     "chess":          ["chess", "lichess", "chess.com"],
     "fitness":        ["gym", "run", "yoga", "lift", "workout", "crossfit", "swim", "bike", "training"],
-    "finance":        ["finance", "budget", "invest", "portfolio", "money", "savings"],
     "research":       ["research", "lab", "experiment", "paper", "grant", "fellowship", "conference", "poster"],
     "music":          ["music", "guitar", "piano", "practice", "jam", "rehearsal", "gig"],
     "visual_arts":    ["art", "paint", "draw", "sketch", "studio", "sculpture"],
-    "gardening":      ["garden", "plant", "prune", "harvest", "compost", "seed"],
+    "industrial":     ["gardening", "restoration", "construction", "engineering", "business"], # Changed from gardening
     "cooking":        ["cook", "meal prep", "bake", "recipe", "kitchen"],
-    "art_criticism":  ["letterboxd", "storygraph", "yelp", "musicboard", "review", "film", "movie", "book club"],
-    "autodidactic": ["study", "read", "course", "book", "essay", "lecture", "autodidactic"],
+    "framework":      ["framework"], # Added new domain
+    "autodidactic":   ["reading", "writing", "criticism", "video", "publishing"], # Updated keywords
     "languages":      ["spanish", "french", "german", "japanese", "mandarin", "duolingo", "anki", "language"],
 }
 
