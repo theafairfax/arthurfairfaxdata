@@ -307,16 +307,21 @@ def _render_heatmap(df: pd.DataFrame):
     st.plotly_chart(fig, use_container_width=True, key="heatmap_chart")
 
 
+# dashboard.py
+
 def _domain_detail_section():
     """Show domain-specific metric history for Chess, Finance, etc."""
     st.markdown("---")
     st.markdown("### Domain Records")
 
+    # Update labels: Removed "Art Criticism", added "Industrial" and "Framework"
     tab_labels = ["♟️ Chess", "🔬 Research", "🎵 Music", "🎨 Visual Arts",
-                  "🌐 Languages", "🎭 Criticism", "📚 Autodidactic", "🌱 Garden", "🍳 Cooking", "🏋️ Fitness"]
+                  "🌐 Languages", "⚙️ Industrial", "📚 Autodidactic", "🌱 Garden", "🍳 Cooking", "🏋️ Fitness", "👼 Framework"]
+    
+    # Update keys: Replaced sheets.TAB_CRITIC with sheets.TAB_INDUSTRIAL and added sheets.TAB_FRAMEWORK
     tab_keys   = [sheets.TAB_CHESS, sheets.TAB_RESEARCH, sheets.TAB_MUSIC,
-                  sheets.TAB_ARTS, sheets.TAB_LANG, sheets.TAB_CRITIC, sheets.TAB_AUTODID,
-                  sheets.TAB_GARDEN, sheets.TAB_COOKING, sheets.TAB_FITNESS]
+                  sheets.TAB_ARTS, sheets.TAB_LANG, sheets.TAB_INDUSTRIAL, sheets.TAB_AUTODID,
+                  sheets.TAB_GARDEN, sheets.TAB_COOKING, sheets.TAB_FITNESS, sheets.TAB_FRAMEWORK]
 
     tabs = st.tabs(tab_labels)
     for tab, key in zip(tabs, tab_keys):
