@@ -257,15 +257,11 @@ def _step3():
             )
 
     # ── Gardening ──────────────────────────────────────────────────────────────
-    if "gardening" in active_domains:
-        with st.expander("🌱 Gardening", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                input_lbs   = st.number_input("Input (lbs seeds/starts)", min_value=0.0, format="%.2f", key="gard_i")
-                yield_lbs   = st.number_input("Yield (lbs harvested)",    min_value=0.0, format="%.2f", key="gard_y")
-            with c2:
-                lifetime_yield = st.number_input("Lifetime Yield (lbs)", min_value=0.0, format="%.2f", key="gard_ly")
-            domain_data["gardening"] = dict(input_lbs=input_lbs, yield_lbs=yield_lbs, lifetime_yield=lifetime_yield)
+    if "industrial" in active_domains:
+        with st.expander("⚙️ Industrial", expanded=True):
+            labor_options = ["gardening", "restoration", "construction", "engineering", "business"]
+            labor_type = st.multiselect("Labor Type", labor_options, key="ind_lt")
+            domain_data["industrial"] = dict(labor_type=", ".join(labor_type))
 
     # ── Cooking ────────────────────────────────────────────────────────────────
     if "cooking" in active_domains:
@@ -296,17 +292,9 @@ def _step3():
     # ── Autodidactic ───────────────────────────────────────────────────────────
     if "autodidactic" in active_domains:
         with st.expander("📚 Autodidactic Studies", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                books_start = st.number_input("Books Started",  min_value=0, key="aut_bs")
-                books_fin   = st.number_input("Books Finished", min_value=0, key="aut_bf")
-            with c2:
-                essays_start = st.number_input("Essays Started",    min_value=0, key="aut_es")
-                essays_pub   = st.number_input("Essays Published",  min_value=0, key="aut_ep")
-            domain_data["autodidactic"] = dict(
-                books_started=books_start, books_finished=books_fin,
-                essays_started=essays_start, essays_published=essays_pub,
-            )
+            study_options = ["reading", "writing", "criticism", "video", "publishing"]
+            study_type = st.multiselect("Study Type", study_options, key="aut_st")
+            domain_data["autodidactic"] = dict(study_type=", ".join(study_type))
 
     # ── Languages ──────────────────────────────────────────────────────────────
     if "languages" in active_domains:
@@ -318,6 +306,10 @@ def _step3():
             with c2:
                 app_minutes = st.number_input("Language App (min today)", min_value=0, key="lang_am")
             domain_data["languages"] = dict(language=language, opic_score=opic_score, app_minutes=app_minutes)
+
+    # ── Framework ──────────────────────────────────────────────────────────────
+    if "framework" in active_domains:
+        domain_data["framework"] = {} # Just tracking time in step 2
 
     # ── Cultural Consumption ───────────────────────────────────────────────────
     with st.expander("🎬 Cultural Consumption", expanded=True):
@@ -424,12 +416,11 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
                 "research":      (sheets.TAB_RESEARCH, ["grants_applied","grants_awarded","fellowships_applied","fellowships_awarded","pubs_submitted","pubs_accepted","presentations","citations"]),
                 "music":         (sheets.TAB_MUSIC,    ["casual_repertoire","soul_repertoire","exhibitions","songs_started","songs_finished"]),
                 "visual_arts":   (sheets.TAB_ARTS,     ["pieces_started","pieces_finished","exhibitions","awards"]),
-                "gardening":     (sheets.TAB_GARDEN,   ["input_lbs","yield_lbs","lifetime_yield"]),
                 "cooking":       (sheets.TAB_COOKING,  ["casual_repertoire","soul_repertoire","hosted_meals"]),
-                "art_criticism": (sheets.TAB_CRITIC,   ["film_reviews","book_reviews","restaurant_reviews","music_reviews"]),
-                "autodidactic":  (sheets.TAB_AUTODID,  ["books_started","books_finished","essays_started","essays_published"]),
                 "languages":     (sheets.TAB_LANG,     ["language","opic_score","app_minutes"]),
-                "finance":       (sheets.TAB_FINANCE,  ["savings_rate_pct","net_worth"]),
+                "industrial":    (sheets.TAB_INDUSTRIAL, ["labor_type"]),
+                "autodidactic":  (sheets.TAB_AUTODID,    ["study_type"]),
+                "framework":     (sheets.TAB_FRAMEWORK,  []),
             }
             for domain, dd in domain_data.items():
                 if domain in tab_map:
