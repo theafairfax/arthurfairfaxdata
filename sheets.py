@@ -22,7 +22,7 @@ TAB_CHESS    = "Chess"
 TAB_FITNESS = "Fitness"
 TAB_RESEARCH= "Research"
 TAB_MUSIC   = "Music"
-TAB_ARTS    = "VisualArts"
+TAB_ARTS    = "Arts"
 TAB_COOKING = "Cooking"
 TAB_AUTODID = "Autodidactic"
 TAB_LANG    = "Languages"
@@ -83,7 +83,7 @@ def write_daily(data: dict) -> None:
     headers = [
         "date", "sleep_hours", "supplements", "morning_routine", "nightly_routine",
         "chess_min", "fitness_min", "research_min", "music_min",
-        "visual_arts_min", "industrial_min", "cooking_min",
+        "arts_min", "industrial_min", "cooking_min",
         "autodidactic_min", "languages_min", "framework_min"
     ]
     
