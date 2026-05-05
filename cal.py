@@ -18,7 +18,7 @@ DOMAIN_KEYWORDS: dict[str, list[str]] = {
     "fitness":        ["gym", "run", "yoga", "lift", "workout", "crossfit", "swim", "bike", "training"],
     "research":       ["research", "lab", "experiment", "paper", "grant", "fellowship", "conference", "poster"],
     "music":          ["music", "guitar", "piano", "practice", "jam", "rehearsal", "gig"],
-    "visual_arts":    ["art", "paint", "draw", "sketch", "studio", "sculpture"],
+    "arts":           ["art", "paint", "draw", "sketch", "studio", "sculpture", "photography", "poetry"],
     "industrial":     ["gardening", "restoration", "construction", "engineering", "business"], # Changed from gardening
     "cooking":        ["cook", "meal prep", "bake", "recipe", "kitchen"],
     "framework":      ["framework"], # Added new domain
