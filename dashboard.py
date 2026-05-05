@@ -315,7 +315,7 @@ def _domain_detail_section():
     st.markdown("### Domain Records")
 
     # Update labels: Removed "Art Criticism", added "Industrial" and "Framework"
-    tab_labels = ["♟️ Chess", "🔬 Research", "🎵 Music", "🎨 Visual Arts",
+    tab_labels = ["♟️ Chess", "🔬 Research", "🎵 Music", "🎨 Arts",
                   "🌐 Languages", "⚙️ Industrial", "📚 Autodidactic", "🍳 Cooking", "🏋️ Fitness", "👼 Framework"]
     
     # Update keys: Replaced sheets.TAB_CRITIC with sheets.TAB_INDUSTRIAL and added sheets.TAB_FRAMEWORK
