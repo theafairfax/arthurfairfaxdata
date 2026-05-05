@@ -52,7 +52,7 @@ DOMAIN_ICONS: dict[str, str] = {
     "fitness":       "🏋️",
     "research":      "🔬",
     "music":         "🎵",
-    "visual_arts":   "🎨",
+    "arts":          "🎨",
     "industrial":    "⚙️", # Replaced gardening
     "cooking":       "🍳",
     "framework":     "👼", # Added (Angel emoji)
@@ -65,7 +65,7 @@ DOMAIN_LABELS: dict[str, str] = {
     "fitness":       "Fitness",
     "research":      "Scientific Research",
     "music":         "Music",
-    "visual_arts":   "Visual Arts",
+    "arts":          "Arts",
     "industrial":    "Industrial", # Replaced Gardening
     "cooking":       "Cooking",
     "framework":     "Framework", # Added
