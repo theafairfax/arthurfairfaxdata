@@ -260,9 +260,6 @@ def render():
             if fig:
                 st.plotly_chart(fig, width='stretch', config={"displayModeBar": False}, key=f"sparkline_{i}_{domain}")
 
-    # ── Chess-specific stats ───────────────────────────────────────────────────
-    _domain_detail_section()
-
 
 def _compute_streak(df: pd.DataFrame) -> int:
     if df.empty or "date" not in df.columns:
@@ -312,10 +309,3 @@ def _render_heatmap(df: pd.DataFrame):
         yaxis=dict(tickfont=dict(size=11)),
     )
     st.plotly_chart(fig, use_container_width=True, key="heatmap_chart")
-
-
-# dashboard.py
-            if records:
-                st.dataframe(pd.DataFrame(records), use_container_width=True, hide_index=True)
-            else:
-                st.caption("No records yet.")
