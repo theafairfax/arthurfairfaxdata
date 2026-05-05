@@ -127,189 +127,58 @@ def _step2():
             _next_step()
             st.rerun()
 
+# entry.py
 
 def _step3():
     st.markdown("## Step 3 of 3 — Arete")
-    st.markdown("*Log accomplishments for any domain you engaged with today.*")
+    st.markdown("*Categorize the labor performed in each active domain.*")
     st.markdown("---")
 
-    # Only show sections for domains where time > 0
     active_domains = [d for d, m in st.session_state.step2_data.items() if m > 0]
-    if not active_domains:
-        st.info("No time logged for any domain today — you can still submit general data.")
-
     domain_data: dict[str, dict] = {}
 
-    # ── Chess ──────────────────────────────────────────────────────────────────
-    if "chess" in active_domains:
-        with st.expander("♟️ Chess", expanded=True):
-            # Auto-fetch from Chess.com
-            if "chess_api_data" not in st.session_state:
-                with st.spinner("Fetching Chess.com rapid stats…"):
-                    st.session_state.chess_api_data = fetch_rapid_chess_stats()
-            api = st.session_state.chess_api_data
+    # Define the new categories
+    LABOR_CATEGORIES = {
+        "research": ["Bench", "Coursework", "Literature"],
+        "music": ["Technique", "Creation", "Teaching", "DAW"],
+        "arts": ["Visual Arts", "Photography", "Poetry"],
+        "languages": ["German", "Spanish", "Russian"],
+        "autodidactic": ["Reading", "Writing", "Criticism"],
+        "cooking": ["Old", "New", "Hosting"],
+        "fitness": ["Yoga", "Resistance", "Calisthenic", "Cardio"],
+        "industrial": ["Gardening", "Restoration", "Construction", "Engineering", "Business"]
+    }
 
-            st.caption(
-                f"♟️ All-time rapid record: "
-                f"{api['wins']}W / {api['losses']}L / {api['draws']}D  |  "
-                f"Win rate: {api['win_ratio']*100:.1f}%  |  "
-                f"Current rating: {api['current_rating']}"
-            )
+    for domain in active_domains:
+        # Skip division for these specific domains
+        if domain in ["chess", "framework"]:
+            domain_data[domain] = {}
+            continue
 
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            wins   = st.number_input("Rapid Wins (all-time)",   min_value=0, value=api["wins"],   key="chess_w")
-            losses = st.number_input("Rapid Losses (all-time)", min_value=0, value=api["losses"], key="chess_l")
-            draws  = st.number_input("Rapid Draws (all-time)",  min_value=0, value=api["draws"],  key="chess_d")
-        with c2:
-            current_rating = st.number_input("Current Rapid Rating", min_value=0, value=api["current_rating"], key="chess_cr")
-            best_rating    = st.number_input("Best Rapid Rating",    min_value=0, value=api["best_rating"],    key="chess_br")
-        with c3:
-            goal_rating = st.number_input("Goal Rating", min_value=0, key="chess_gr")
-        domain_data["chess"] = dict(
-            wins=wins, losses=losses, draws=draws,
-            current_rating=current_rating, best_rating=best_rating, goal_rating=goal_rating,
-        )
+        if domain in LABOR_CATEGORIES:
+            with st.expander(f"{DOMAIN_ICONS[domain]} {DOMAIN_LABELS[domain]}", expanded=True):
+                options = LABOR_CATEGORIES[domain]
+                selected = st.multiselect(f"Labor Type ({DOMAIN_LABELS[domain]})", options, key=f"lab_{domain}")
+                domain_data[domain] = {"labor_type": ", ".join(selected)}
 
-    # ── Fitness ────────────────────────────────────────────────────────────────
-    if "fitness" in active_domains:
-        with st.expander("🏋️ Fitness", expanded=True):
-            st.markdown("**Apple Watch / Scale**")
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                active_cal  = st.number_input("Active Calories", min_value=0, key="fit_ac")
-                resting_hr  = st.number_input("Resting HR (bpm)", min_value=0, key="fit_hr")
-            with c2:
-                weight_lbs  = st.number_input("Weight (lbs)", min_value=0.0, format="%.1f", key="fit_wt")
-                body_fat    = st.number_input("Body Fat %", min_value=0.0, max_value=100.0, format="%.1f", key="fit_bf")
-            with c3:
-                hrv         = st.number_input("HRV (ms)", min_value=0, key="fit_hrv")
+    # ... [Keep Cultural Consumption section as is] ...
 
-            st.markdown("**Training Volume**")
-            c4, c5, c6 = st.columns(3)
-            with c4:
-                run_dist_mi = st.number_input("Run Distance (mi)", min_value=0.0, format="%.2f", key="fit_rd")
-                run_time_min= st.number_input("Run Time (min)",    min_value=0,   key="fit_rt")
-            with c5:
-                lift_sets   = st.number_input("Max Lift Sets",  min_value=0, key="fit_ls")
-                lift_reps   = st.number_input("Max Lift Reps",  min_value=0, key="fit_lr")
-            with c6:
-                yoga_min    = st.number_input("Yoga Time (min)",       min_value=0, key="fit_yt")
-                yoga_intensity = st.selectbox("Yoga Intensity", ["—", "Gentle", "Moderate", "Vigorous"], key="fit_yi")
-            domain_data["fitness"] = dict(
-                active_calories=active_cal, resting_hr=resting_hr,
-                weight_lbs=weight_lbs, body_fat_pct=body_fat, hrv_ms=hrv,
-                run_distance_mi=run_dist_mi, run_time_min=run_time_min,
-                lift_sets=lift_sets, lift_reps=lift_reps,
-                yoga_min=yoga_min, yoga_intensity=yoga_intensity,
-            )
-
-    # ── Research ───────────────────────────────────────────────────────────────
-    if "research" in active_domains:
-        with st.expander("🔬 Scientific Research", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                grants_app  = st.number_input("Grants Applied",    min_value=0, key="res_ga")
-                grants_awd  = st.number_input("Grants Awarded",    min_value=0, key="res_gaw")
-                fellow_app  = st.number_input("Fellowships Applied", min_value=0, key="res_fa")
-                fellow_awd  = st.number_input("Fellowships Awarded", min_value=0, key="res_faw")
-            with c2:
-                pubs_sub    = st.number_input("Publications Submitted", min_value=0, key="res_ps")
-                pubs_acc    = st.number_input("Publications Accepted",  min_value=0, key="res_pa")
-                presentations = st.number_input("Presentations/Posters", min_value=0, key="res_pr")
-                citations   = st.number_input("Total Citations",        min_value=0, key="res_ci")
-            domain_data["research"] = dict(
-                grants_applied=grants_app, grants_awarded=grants_awd,
-                fellowships_applied=fellow_app, fellowships_awarded=fellow_awd,
-                pubs_submitted=pubs_sub, pubs_accepted=pubs_acc,
-                presentations=presentations, citations=citations,
-            )
-
-    # ── Music ──────────────────────────────────────────────────────────────────
-    if "music" in active_domains:
-        with st.expander("🎵 Music", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                casual_rep = st.number_input("Casual Repertoire (# songs)", min_value=0, key="mus_cr")
-                soul_rep   = st.number_input("Soul Repertoire (# songs)",   min_value=0, key="mus_sr")
-            with c2:
-                exhibitions = st.number_input("Exhibitions / Gigs", min_value=0, key="mus_ex")
-                songs_start = st.number_input("Songs Started",     min_value=0, key="mus_ss")
-                songs_fin   = st.number_input("Songs Finished",    min_value=0, key="mus_sf")
-            domain_data["music"] = dict(
-                casual_repertoire=casual_rep, soul_repertoire=soul_rep,
-                exhibitions=exhibitions, songs_started=songs_start, songs_finished=songs_fin,
-            )
-
-    # ── Visual Arts ────────────────────────────────────────────────────────────
-    if "visual_arts" in active_domains:
-        with st.expander("🎨 Visual Arts", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                pieces_start = st.number_input("Pieces Started",  min_value=0, key="va_ps")
-                pieces_fin   = st.number_input("Pieces Finished", min_value=0, key="va_pf")
-            with c2:
-                exhibitions  = st.number_input("Exhibitions", min_value=0, key="va_ex")
-                awards       = st.number_input("Awards",      min_value=0, key="va_aw")
-            domain_data["visual_arts"] = dict(
-                pieces_started=pieces_start, pieces_finished=pieces_fin,
-                exhibitions=exhibitions, awards=awards,
-            )
-
-    # ── Gardening ──────────────────────────────────────────────────────────────
-    if "industrial" in active_domains:
-        with st.expander("⚙️ Industrial", expanded=True):
-            labor_options = ["gardening", "restoration", "construction", "engineering", "business"]
-            labor_type = st.multiselect("Labor Type", labor_options, key="ind_lt")
-            domain_data["industrial"] = dict(labor_type=", ".join(labor_type))
-
-    # ── Cooking ────────────────────────────────────────────────────────────────
-    if "cooking" in active_domains:
-        with st.expander("🍳 Cooking", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                casual_rep = st.number_input("Casual Repertoire (# dishes)", min_value=0, key="cook_cr")
-                soul_rep   = st.number_input("Soul Repertoire (# dishes)",   min_value=0, key="cook_sr")
-            with c2:
-                hosted = st.number_input("Hosted Meals", min_value=0, key="cook_hm")
-            domain_data["cooking"] = dict(casual_repertoire=casual_rep, soul_repertoire=soul_rep, hosted_meals=hosted)
-
-    # ── Art Criticism ──────────────────────────────────────────────────────────
-    if "art_criticism" in active_domains:
-        with st.expander("🎭 Art Criticism", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                films   = st.number_input("Film/TV Reviews (Letterboxd)",  min_value=0, key="ac_fi")
-                books   = st.number_input("Book Reviews (StoryGraph)",      min_value=0, key="ac_bo")
-            with c2:
-                restaurants = st.number_input("Restaurant Reviews (Yelp)",  min_value=0, key="ac_re")
-                music_rev   = st.number_input("Music Reviews (MusicBoard)", min_value=0, key="ac_mu")
-            domain_data["art_criticism"] = dict(
-                film_reviews=films, book_reviews=books,
-                restaurant_reviews=restaurants, music_reviews=music_rev,
-            )
-
-    # ── Autodidactic ───────────────────────────────────────────────────────────
-    if "autodidactic" in active_domains:
-        with st.expander("📚 Autodidactic Studies", expanded=True):
-            study_options = ["reading", "writing", "criticism", "video", "publishing"]
-            study_type = st.multiselect("Study Type", study_options, key="aut_st")
-            domain_data["autodidactic"] = dict(study_type=", ".join(study_type))
-
-    # ── Languages ──────────────────────────────────────────────────────────────
-    if "languages" in active_domains:
-        with st.expander("🌐 Languages", expanded=True):
-            language = st.text_input("Language", placeholder="e.g. Spanish", key="lang_lg")
-            c1, c2 = st.columns(2)
-            with c1:
-                opic_score  = st.selectbox("OPIc Score", ["—","NL","NM","NH","IL","IM","IH","AL","AM","AH","S"], key="lang_op")
-            with c2:
-                app_minutes = st.number_input("Language App (min today)", min_value=0, key="lang_am")
-            domain_data["languages"] = dict(language=language, opic_score=opic_score, app_minutes=app_minutes)
-
-    # ── Framework ──────────────────────────────────────────────────────────────
-    if "framework" in active_domains:
-        domain_data["framework"] = {} # Just tracking time in step 2
+def _submit(domain_data: dict, cultural_entries: list | None = None):
+    # ...
+    # Update tab_map in the _submit function to handle the simplified "labor_type" only
+    tab_map = {
+        "chess":         (sheets.TAB_CHESS,    ["wins","losses","draws","current_rating","best_rating","goal_rating"]),
+        "fitness":       (sheets.TAB_FITNESS,  ["labor_type"]),
+        "research":      (sheets.TAB_RESEARCH, ["labor_type"]),
+        "music":         (sheets.TAB_MUSIC,    ["labor_type"]),
+        "arts":          (sheets.TAB_ARTS,     ["labor_type"]),
+        "cooking":       (sheets.TAB_COOKING,  ["labor_type"]),
+        "languages":     (sheets.TAB_LANG,     ["labor_type"]),
+        "industrial":    (sheets.TAB_INDUSTRIAL, ["labor_type"]),
+        "autodidactic":  (sheets.TAB_AUTODID,    ["labor_type"]),
+        "framework":     (sheets.TAB_FRAMEWORK,  []),
+    }
+    # ...
 
     # ── Cultural Consumption ───────────────────────────────────────────────────
     with st.expander("🎬 Cultural Consumption", expanded=True):
