@@ -315,25 +315,6 @@ def _render_heatmap(df: pd.DataFrame):
 
 
 # dashboard.py
-
-def _domain_detail_section():
-    """Show domain-specific metric history for Chess, Finance, etc."""
-    st.markdown("---")
-    st.markdown("### Domain Records")
-
-    # Update labels: Removed "Art Criticism", added "Industrial" and "Framework"
-    tab_labels = ["♟️ Chess", "🔬 Research", "🎵 Music", "🎨 Arts",
-                  "🌐 Languages", "⚙️ Industrial", "📚 Autodidactic", "🍳 Cooking", "🏋️ Fitness", "👼 Framework"]
-    
-    # Update keys: Replaced sheets.TAB_CRITIC with sheets.TAB_INDUSTRIAL and added sheets.TAB_FRAMEWORK
-    tab_keys   = [sheets.TAB_CHESS, sheets.TAB_RESEARCH, sheets.TAB_MUSIC,
-                  sheets.TAB_ARTS, sheets.TAB_LANG, sheets.TAB_INDUSTRIAL, sheets.TAB_AUTODID,
-                  sheets.TAB_COOKING, sheets.TAB_FITNESS, sheets.TAB_FRAMEWORK]
-
-    tabs = st.tabs(tab_labels)
-    for tab, key in zip(tabs, tab_keys):
-        with tab:
-            records = sheets.read_all(key)
             if records:
                 st.dataframe(pd.DataFrame(records), use_container_width=True, hide_index=True)
             else:
