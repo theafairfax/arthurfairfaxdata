@@ -203,9 +203,16 @@ def render():
     st.markdown("---")
     st.markdown("### Domain Levels")
 
-    # Two-column grid of domain cards
+    # NEW: Sort domains by total minutes (descending)
+    sorted_domains = sorted(
+        ALL_DOMAINS, 
+        key=lambda d: totals.get(d, 0), 
+        reverse=True
+    )
+
+    # Two-column grid of domain cards using the sorted list
     left, right = st.columns(2)
-    for i, domain in enumerate(ALL_DOMAINS):
+    for i, domain in enumerate(sorted_domains):
         with (left if i % 2 == 0 else right):
             _domain_card(domain, totals[domain], df)
 
