@@ -127,6 +127,8 @@ def _step2():
 
 # entry.py
 
+# [ ... Step 1 and Step 2 remain as they are ... ]
+
 def _step3():
     st.markdown("## Step 3 of 3 — Arete")
     st.markdown("*Categorize the labor performed in each active domain.*")
@@ -135,7 +137,6 @@ def _step3():
     active_domains = [d for d, m in st.session_state.step2_data.items() if m > 0]
     domain_data: dict[str, dict] = {}
 
-    # Define the new categories
     LABOR_CATEGORIES = {
         "research": ["Bench", "Coursework", "Literature"],
         "music": ["Technique", "Creation", "Teaching", "DAW"],
@@ -148,7 +149,6 @@ def _step3():
     }
 
     for domain in active_domains:
-        # Skip division for these specific domains
         if domain in ["chess", "framework"]:
             domain_data[domain] = {}
             continue
@@ -158,25 +158,6 @@ def _step3():
                 options = LABOR_CATEGORIES[domain]
                 selected = st.multiselect(f"Labor Type ({DOMAIN_LABELS[domain]})", options, key=f"lab_{domain}")
                 domain_data[domain] = {"labor_type": ", ".join(selected)}
-
-    # ... [Keep Cultural Consumption section as is] ...
-
-def _submit(domain_data: dict, cultural_entries: list | None = None):
-    # ...
-    # Update tab_map in the _submit function to handle the simplified "labor_type" only
-    tab_map = {
-        "chess":         (sheets.TAB_CHESS,    []),
-        "fitness":       (sheets.TAB_FITNESS,  ["labor_type"]),
-        "research":      (sheets.TAB_RESEARCH, ["labor_type"]),
-        "music":         (sheets.TAB_MUSIC,    ["labor_type"]),
-        "arts":          (sheets.TAB_ARTS,     ["labor_type"]),
-        "cooking":       (sheets.TAB_COOKING,  ["labor_type"]),
-        "languages":     (sheets.TAB_LANG,     ["labor_type"]),
-        "industrial":    (sheets.TAB_INDUSTRIAL, ["labor_type"]),
-        "autodidactic":  (sheets.TAB_AUTODID,    ["labor_type"]),
-        "framework":     (sheets.TAB_FRAMEWORK,  []),
-    }
-    # ...
 
     # ── Cultural Consumption ───────────────────────────────────────────────────
     with st.expander("🎬 Cultural Consumption", expanded=True):
@@ -191,7 +172,7 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
         }
 
         selected_types = st.multiselect(
-            "Select all kinds of cultural products consumed today",
+            "Select types",
             options=list(CULTURAL_TYPES.keys()),
             format_func=lambda k: f"{CULTURAL_TYPES[k][0]} {CULTURAL_TYPES[k][1]}",
             key="cult_types",
@@ -203,38 +184,21 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
             icon, label, placeholder = CULTURAL_TYPES[ct]
             st.markdown(f"**{icon} {label}**")
 
-            # Allow multiple entries per type
             if f"cult_{ct}_count" not in st.session_state:
                 st.session_state[f"cult_{ct}_count"] = 1
 
             for idx in range(st.session_state[f"cult_{ct}_count"]):
                 c1, c2 = st.columns([3, 1])
                 with c1:
-                    title = st.text_input(
-                        f"Title #{idx + 1}",
-                        placeholder=placeholder,
-                        key=f"cult_{ct}_{idx}_title",
-                        label_visibility="collapsed",
-                    )
+                    title = st.text_input(f"Title #{idx+1}", placeholder=placeholder, key=f"cult_{ct}_{idx}_t", label_visibility="collapsed")
                 with c2:
-                    reviewed = st.selectbox(
-                        "Review left?",
-                        ["No", "Yes"],
-                        key=f"cult_{ct}_{idx}_reviewed",
-                        label_visibility="collapsed",
-                    )
+                    reviewed = st.selectbox("Review?", ["No", "Yes"], key=f"cult_{ct}_{idx}_r", label_visibility="collapsed")
                 if title:
-                    cultural_entries.append({
-                        "type": label,
-                        "title": title,
-                        "review_left": reviewed,
-                    })
+                    cultural_entries.append({"type": label, "title": title, "review_left": reviewed})
 
-            if st.button(f"+ Add another {label}", key=f"cult_{ct}_add"):
+            if st.button(f"+ Add {label}", key=f"cult_{ct}_add"):
                 st.session_state[f"cult_{ct}_count"] += 1
                 st.rerun()
-
-            st.markdown("")
 
     # ── Navigation ────────────────────────────────────────────────────────────
     st.markdown("---")
@@ -247,7 +211,6 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
         if st.button("✅ Submit Entry", use_container_width=True):
             _submit(domain_data, cultural_entries)
 
-
 def _submit(domain_data: dict, cultural_entries: list | None = None):
     today = str(date.today())
     s1 = st.session_state.step1_data
@@ -255,19 +218,19 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
 
     with st.spinner("Writing to Google Sheets…"):
         try:
-            # Daily summary row
+            # 1. Daily summary row
             daily_row = {
-                "date":             today,
-                "sleep_hours":      s1.get("sleep_hours", ""),
-                "supplements":      s1.get("supplements", ""),
-                "morning_routine":  s1.get("morning_routine", ""),
-                "nightly_routine":  s1.get("nightly_routine", ""),
+                "date": today,
+                "sleep_hours": s1.get("sleep_hours", ""),
+                "supplements": s1.get("supplements", ""),
+                "morning_routine": s1.get("morning_routine", ""),
+                "nightly_routine": s1.get("nightly_routine", ""),
             }
             for domain in ALL_DOMAINS:
                 daily_row[f"{domain}_min"] = s2.get(domain, 0)
             sheets.write_daily(daily_row)
 
-            # Cultural consumption rows
+            # 2. Cultural consumption rows
             if cultural_entries:
                 for entry in cultural_entries:
                     sheets.write_domain(
@@ -276,19 +239,20 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
                         {"date": today, **entry},
                     )
 
-            # Domain-specific rows
+            # 3. Domain-specific rows (Simplified to "labor_type" only)
             tab_map = {
-                "chess":         (sheets.TAB_CHESS,    ["wins","losses","draws","current_rating","best_rating","goal_rating"]),
-                "fitness":       (sheets.TAB_FITNESS,  ["active_calories","resting_hr","weight_lbs","body_fat_pct","hrv_ms","run_distance_mi","run_time_min","lift_sets","lift_reps","yoga_min","yoga_intensity"]),
-                "research":      (sheets.TAB_RESEARCH, ["grants_applied","grants_awarded","fellowships_applied","fellowships_awarded","pubs_submitted","pubs_accepted","presentations","citations"]),
-                "music":         (sheets.TAB_MUSIC,    ["casual_repertoire","soul_repertoire","exhibitions","songs_started","songs_finished"]),
-                "visual_arts":   (sheets.TAB_ARTS,     ["pieces_started","pieces_finished","exhibitions","awards"]),
-                "cooking":       (sheets.TAB_COOKING,  ["casual_repertoire","soul_repertoire","hosted_meals"]),
-                "languages":     (sheets.TAB_LANG,     ["language","opic_score","app_minutes"]),
+                "chess":         (sheets.TAB_CHESS,    []),
+                "fitness":       (sheets.TAB_FITNESS,  ["labor_type"]),
+                "research":      (sheets.TAB_RESEARCH, ["labor_type"]),
+                "music":         (sheets.TAB_MUSIC,    ["labor_type"]),
+                "arts":          (sheets.TAB_ARTS,     ["labor_type"]),
+                "cooking":       (sheets.TAB_COOKING,  ["labor_type"]),
+                "languages":     (sheets.TAB_LANG,     ["labor_type"]),
                 "industrial":    (sheets.TAB_INDUSTRIAL, ["labor_type"]),
-                "autodidactic":  (sheets.TAB_AUTODID,    ["study_type"]),
+                "autodidactic":  (sheets.TAB_AUTODID,    ["labor_type"]),
                 "framework":     (sheets.TAB_FRAMEWORK,  []),
             }
+            
             for domain, dd in domain_data.items():
                 if domain in tab_map:
                     tab, headers = tab_map[domain]
@@ -300,15 +264,11 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
 
         except Exception as e:
             st.error(f"Error writing to Google Sheets: {e}")
-            st.info("Check your secrets.toml and Sheet permissions.")
-
 
 # ── Main render ────────────────────────────────────────────────────────────────
 
 def render():
     _init_state()
-
-    # Progress indicator
     step = st.session_state.entry_step
     progress_labels = ["1 · Sleep & Health", "2 · Time Logged", "3 · Arete"]
     cols = st.columns(3)
