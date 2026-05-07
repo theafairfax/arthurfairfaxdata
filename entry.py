@@ -10,8 +10,6 @@ from datetime import date, datetime, time
 
 import streamlit as st
 
-from chess_api import fetch_rapid_chess_stats
-
 import sheets
 import xp as xp_utils
 from cal import fetch_today_domain_minutes
@@ -167,7 +165,7 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
     # ...
     # Update tab_map in the _submit function to handle the simplified "labor_type" only
     tab_map = {
-        "chess":         (sheets.TAB_CHESS,    ["wins","losses","draws","current_rating","best_rating","goal_rating"]),
+        "chess":         (sheets.TAB_CHESS,    []),
         "fitness":       (sheets.TAB_FITNESS,  ["labor_type"]),
         "research":      (sheets.TAB_RESEARCH, ["labor_type"]),
         "music":         (sheets.TAB_MUSIC,    ["labor_type"]),
