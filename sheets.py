@@ -28,6 +28,7 @@ TAB_AUTODID = "Autodidactic"
 TAB_LANG    = "Languages"
 TAB_INDUSTRIAL = "Industrial" # Replaced TAB_GARDEN
 TAB_FRAMEWORK  = "Framework"  # Added
+TAB_ASPIRATIONS = "Aspirations"
 
 
 @st.cache_resource(show_spinner=False)
@@ -105,3 +106,27 @@ def write_domain(tab_name: str, headers: list[str], data: dict) -> None:
     
     row = [str(date.today())] + [data.get(h, "") for h in headers]
     ws.append_row(row, value_input_option="USER_ENTERED")
+
+def update_aspiration_status(title: str, new_status: str) -> bool:
+    """Finds an aspiration by title and updates its Status cell."""
+    ss = get_spreadsheet()
+    try:
+        ws = ss.worksheet(TAB_ASPIRATIONS)
+        records = ws.get_all_records()
+        headers = ws.row_values(1)
+        
+        if "Title" not in headers or "Status" not in headers:
+            return False
+            
+        title_col_idx = headers.index("Title")
+        status_col_idx = headers.index("Status") + 1 # 1-based index
+        
+        for idx, row in enumerate(records):
+            # ws.get_all_records() shifts row references down by 2 (1 for header, 1 for 0-indexing)
+            if str(row.get("Title")).strip() == str(title).strip():
+                row_to_update = idx + 2
+                ws.update_cell(row_to_update, status_col_idx, new_status)
+                return True
+        return False
+    except Exception:
+        return False
