@@ -112,7 +112,7 @@ def render():
             impact_score = st.slider("Potential Impact Score (1-5)", min_value=1, max_value=5, value=3)
             description = st.text_area("Description / Criteria", placeholder="Detailed definitions of success...")
             
-            submit = st.form_submit_submit("Inscribe into Log")
+            submit = st.form_submit_button("Inscribe into Log")
             
             if submit:
                 if not title:
