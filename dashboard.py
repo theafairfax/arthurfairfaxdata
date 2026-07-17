@@ -203,6 +203,84 @@ def render():
     st.markdown("---")
     st.markdown("### Domain Levels")
 
+    # ── 💡 WEEKLY MOMENTUM PROGRESS BAR ─────────────────────────────────────────
+    if not df.empty and "date" in df.columns:
+        # 1. Define Week Boundaries (Monday through Sunday)
+        today = pd.Timestamp(pd.Timestamp.now().date())
+        current_weekday = today.weekday()  # Mon=0, Sun=6
+        
+        # Start of this week (Monday)
+        this_week_start = today - pd.Timedelta(days=current_weekday)
+        
+        # Target past 3 full weeks (Mon-Sun boundaries)
+        w1_start = this_week_start - pd.Timedelta(weeks=1)
+        w1_end = w1_start + pd.Timedelta(days=6)
+        
+        w2_start = this_week_start - pd.Timedelta(weeks=2)
+        w2_end = w2_start + pd.Timedelta(days=6)
+        
+        w3_start = this_week_start - pd.Timedelta(weeks=3)
+        w3_end = w3_start + pd.Timedelta(days=6)
+        
+        # 2. Extract min columns present in your dataframe
+        min_cols = [f"{d}_min" for d in ALL_DOMAINS if f"{d}_min" in df.columns]
+        
+        if min_cols:
+            # Helper to calculate total hours logged across all domains for a date range
+            def get_hours_in_range(start_dt, end_dt):
+                mask = (df["date"] >= start_dt) & (df["date"] <= end_dt)
+                filtered_df = df[mask]
+                total_min = 0
+                for col in min_cols:
+                    total_min += pd.to_numeric(filtered_df[col], errors="coerce").fillna(0).sum()
+                return float(total_min / 60.0)
+
+            # Compute hours
+            current_week_hours = get_hours_in_range(this_week_start, today)
+            
+            hours_w1 = get_hours_in_range(w1_start, w1_end)
+            hours_w2 = get_hours_in_range(w2_start, w2_end)
+            hours_w3 = get_hours_in_range(w3_start, w3_end)
+            
+            # Historical 3-week baseline average
+            avg_historical_hours = (hours_w1 + hours_w2 + hours_w3) / 3.0
+            
+            # 3. Graphic & Progress Configuration
+            st.markdown("### ⚡ Weekly Momentum")
+            
+            progress_pct = min(current_week_hours / avg_historical_hours, 1.0) if avg_historical_hours > 0 else 0.0
+            st.progress(progress_pct)
+            
+            # Encouraging Contextual Copy
+            remaining_hrs = avg_historical_hours - current_week_hours
+            
+            if current_week_hours >= avg_historical_hours:
+                st.success(
+                    f"🚀 **+{(current_week_hours - avg_historical_hours):.1f} hrs above your baseline!** "
+                    f"You have outpaced your 3-week average ({avg_historical_hours:.1f} hrs). Keep setting the standard!"
+                )
+            elif remaining_hrs <= 5.0:
+                st.info(
+                    f"🔥 **Within striking distance!** Just **{remaining_hrs:.1f} hrs** left to match your "
+                    f"typical weekly output of **{avg_historical_hours:.1f} hrs**. Finish strong!"
+                )
+            else:
+                st.warning(
+                    f"💪 **{current_week_hours:.1f} / {avg_historical_hours:.1f} hrs** put in this week. "
+                    f"You need **{remaining_hrs:.1f} hrs** to beat your standard performance baseline. Let's get to work!"
+                )
+            st.text("")  # Visual layout spacer
+
+    # ── Original Content: Domain Levels ───────────────────────────────────────
+    st.markdown("### Domain Levels")[cite: 3]
+
+    # NEW: Sort domains by total minutes (descending)[cite: 3]
+    sorted_domains = sorted([cite: 3]
+        ALL_DOMAINS,[cite: 3]
+        key=lambda d: totals.get(d, 0),[cite: 3]
+        reverse=True[cite: 3]
+    )[cite: 3]
+
     # NEW: Sort domains by total minutes (descending)
     sorted_domains = sorted(
         ALL_DOMAINS, 
