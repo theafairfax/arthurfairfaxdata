@@ -274,13 +274,6 @@ def render():
     # ── Original Content: Domain Levels ───────────────────────────────────────
     st.markdown("### Domain Levels")[cite: 3]
 
-    # NEW: Sort domains by total minutes (descending)[cite: 3]
-    sorted_domains = sorted([cite: 3]
-        ALL_DOMAINS,[cite: 3]
-        key=lambda d: totals.get(d, 0),[cite: 3]
-        reverse=True[cite: 3]
-    )[cite: 3]
-
     # NEW: Sort domains by total minutes (descending)
     sorted_domains = sorted(
         ALL_DOMAINS, 
