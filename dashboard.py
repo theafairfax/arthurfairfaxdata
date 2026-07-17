@@ -272,7 +272,7 @@ def render():
             st.text("")  # Visual layout spacer
 
     # ── Original Content: Domain Levels ───────────────────────────────────────
-    st.markdown("### Domain Levels")[cite: 3]
+    st.markdown("### Domain Levels")
 
     # NEW: Sort domains by total minutes (descending)
     sorted_domains = sorted(
