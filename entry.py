@@ -48,6 +48,18 @@ def _step1():
     st.markdown("*Sleep, supplements, and routines from last night / this morning.*")
     st.markdown("---")
 
+    # --- Target Wake Up Check from Yesterday ---
+    last_target = sheets.get_last_target_wake_time()
+    met_target = "N/A"
+    if last_target:
+        st.markdown(f"#### 🎯 Target Wake-Up Time Check")
+        met_target = st.radio(
+            f"Your target wake-up time was **{last_target}**. Did you hit it today?",
+            ["Yes", "No"],
+            horizontal=True
+        )
+        st.markdown("---")
+
     col1, col2 = st.columns(2)
     with col1:
         bedtime = st.time_input("🌙 Time you went to sleep", value=time(23, 0))
@@ -75,16 +87,21 @@ def _step1():
         nightly_routine = st.radio("Nightly routine completed?", ["Yes", "No"], horizontal=True)
 
     st.markdown("---")
+    st.markdown("#### ⏰ Tomorrow's Target")
+    target_wake_time = st.time_input("Target wake-up time for tomorrow", value=time(7, 0))
+
+    st.markdown("---")
     if st.button("Continue →", use_container_width=True):
         st.session_state.step1_data = {
-            "sleep_hours":      sleep_hours,
-            "supplements":      ", ".join(supplements) if supplements else "None",
-            "morning_routine":  morning_routine,
-            "nightly_routine":  nightly_routine,
+            "sleep_hours":          sleep_hours,
+            "supplements":          ", ".join(supplements) if supplements else "None",
+            "morning_routine":      morning_routine,
+            "nightly_routine":      nightly_routine,
+            "met_target_wake_time": met_target,
+            "target_wake_time":     target_wake_time.strftime("%I:%M %p"),
         }
         _next_step()
         st.rerun()
-
 
 def _step2():
     st.markdown("## Step 2 of 3 — Time Spent per Domain")
@@ -138,18 +155,19 @@ def _step3():
     domain_data: dict[str, dict] = {}
 
     LABOR_CATEGORIES = {
-        "research": ["Bench", "Coursework", "Literature"],
-        "music": ["Technique", "Creation", "Teaching", "DAW"],
-        "arts": ["Visual Arts", "Photography", "Poetry"],
-        "languages": ["German", "Spanish", "Russian"],
+        "research":     ["Bench", "Coursework", "Literature"],
+        "music":        ["Technique", "Creation", "Teaching", "DAW"],
+        "arts":         ["Visual Arts", "Photography", "Poetry"],
+        "languages":    ["German", "Spanish", "Russian"],
         "autodidactic": ["Reading", "Writing", "Criticism"],
-        "cooking": ["Old", "New", "Hosting"],
-        "fitness": ["Yoga", "Resistance", "Calisthenic", "Cardio"],
-        "industrial": ["Gardening", "Restoration", "Construction", "Engineering", "Business"]
+        "cooking":      ["Old", "New", "Hosting"],
+        "fitness":      ["Yoga", "Resistance", "Calisthenic", "Cardio"],
+        "industrial":   ["Gardening", "Restoration", "Construction", "Engineering", "Business"],
+        "framework":    ["Financial", "Planning", "Code", "Cleaning/Organizing"]
     }
 
     for domain in active_domains:
-        if domain in ["chess", "framework"]:
+        if domain == "chess":
             domain_data[domain] = {}
             continue
 
@@ -211,6 +229,7 @@ def _step3():
         if st.button("✅ Submit Entry", use_container_width=True):
             _submit(domain_data, cultural_entries)
 
+
 def _submit(domain_data: dict, cultural_entries: list | None = None):
     today = str(date.today())
     s1 = st.session_state.step1_data
@@ -220,11 +239,13 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
         try:
             # 1. Daily summary row
             daily_row = {
-                "date": today,
-                "sleep_hours": s1.get("sleep_hours", ""),
-                "supplements": s1.get("supplements", ""),
-                "morning_routine": s1.get("morning_routine", ""),
-                "nightly_routine": s1.get("nightly_routine", ""),
+                "date":                 today,
+                "sleep_hours":          s1.get("sleep_hours", ""),
+                "supplements":          s1.get("supplements", ""),
+                "morning_routine":      s1.get("morning_routine", ""),
+                "nightly_routine":      s1.get("nightly_routine", ""),
+                "target_wake_time":     s1.get("target_wake_time", ""),
+                "met_target_wake_time": s1.get("met_target_wake_time", ""),
             }
             for domain in ALL_DOMAINS:
                 daily_row[f"{domain}_min"] = s2.get(domain, 0)
@@ -239,18 +260,18 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
                         {"date": today, **entry},
                     )
 
-            # 3. Domain-specific rows (Simplified to "labor_type" only)
+            # 3. Domain-specific rows
             tab_map = {
-                "chess":         (sheets.TAB_CHESS,    []),
-                "fitness":       (sheets.TAB_FITNESS,  ["labor_type"]),
-                "research":      (sheets.TAB_RESEARCH, ["labor_type"]),
-                "music":         (sheets.TAB_MUSIC,    ["labor_type"]),
-                "arts":          (sheets.TAB_ARTS,     ["labor_type"]),
-                "cooking":       (sheets.TAB_COOKING,  ["labor_type"]),
-                "languages":     (sheets.TAB_LANG,     ["labor_type"]),
+                "chess":         (sheets.TAB_CHESS,      []),
+                "fitness":       (sheets.TAB_FITNESS,    ["labor_type"]),
+                "research":      (sheets.TAB_RESEARCH,   ["labor_type"]),
+                "music":         (sheets.TAB_MUSIC,      ["labor_type"]),
+                "arts":          (sheets.TAB_ARTS,       ["labor_type"]),
+                "cooking":       (sheets.TAB_COOKING,    ["labor_type"]),
+                "languages":     (sheets.TAB_LANG,       ["labor_type"]),
                 "industrial":    (sheets.TAB_INDUSTRIAL, ["labor_type"]),
                 "autodidactic":  (sheets.TAB_AUTODID,    ["labor_type"]),
-                "framework":     (sheets.TAB_FRAMEWORK,  []),
+                "framework":     (sheets.TAB_FRAMEWORK,  ["labor_type"]),
             }
             
             for domain, dd in domain_data.items():
