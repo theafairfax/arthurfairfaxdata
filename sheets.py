@@ -76,6 +76,18 @@ def read_all(tab_name: str) -> list[dict]:
 
 # ── High-level write helpers ───────────────────────────────────────────────────
 
+def get_last_target_wake_time() -> str:
+    """Retrieves the target wake-up time set in the most recent Daily entry."""
+    records = read_all(TAB_DAILY)
+    if not records:
+        return ""
+    # Find the latest record with a set target_wake_time
+    for record in reversed(records):
+        target = record.get("target_wake_time")
+        if target:
+            return str(target)
+    return ""
+    
 def write_daily(data: dict) -> None:
     ss = get_spreadsheet()
     # ADD THIS LINE: Define the worksheet 'ws' before using it below
@@ -95,6 +107,9 @@ def write_daily(data: dict) -> None:
 
 
 # sheets.py
+
+# utils/sheets.py
+
 
 def write_domain(tab_name: str, headers: list[str], data: dict) -> None:
     ss = get_spreadsheet()
