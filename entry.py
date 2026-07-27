@@ -161,7 +161,7 @@ def _step3():
         "languages":    ["German", "Spanish", "Russian"],
         "autodidactic": ["Reading", "Writing", "Criticism"],
         "cooking":      ["Old", "New", "Hosting"],
-        "fitness":      ["Yoga", "Resistance", "Calisthenic", "Cardio"],
+        "fitness":      ["Yoga", "Upper Body: Push", "Upper Body: Pull", "Lower Body", "TotF", "Cardio"],
         "industrial":   ["Gardening", "Restoration", "Construction", "Engineering", "Business"],
         "framework":    ["Financial", "Planning", "Code", "Cleaning/Organizing"]
     }
