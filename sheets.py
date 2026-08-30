@@ -15,19 +15,19 @@ SCOPES = [
 ]
 
 # ── Tab names (must match your Google Sheet exactly) ──────────────────────────
-TAB_DAILY    = "Daily"
-TAB_CV       = "Main Tab"      # ← CV sheet tab name — update if yours differs
+TAB_DAILY = "Daily"
+TAB_CV = "Main Tab"      # ← CV sheet tab name — update if yours differs
 TAB_CULTURAL = "Cultural"
-TAB_CHESS    = "Chess"
+TAB_CHESS = "Chess"
 TAB_FITNESS = "Fitness"
-TAB_RESEARCH= "Research"
-TAB_MUSIC   = "Music"
-TAB_ARTS    = "Arts"
+TAB_RESEARCH = "Research"
+TAB_MUSIC = "Music"
+TAB_ARTS = "Arts"
 TAB_COOKING = "Cooking"
 TAB_AUTODID = "Autodidactic"
-TAB_LANG    = "Languages"
-TAB_INDUSTRIAL = "Industrial" # Replaced TAB_GARDEN
-TAB_FRAMEWORK  = "Framework"  # Added
+TAB_LANG = "Languages"
+TAB_INDUSTRIAL = "Industrial"
+TAB_FRAMEWORK = "Framework"
 TAB_ASPIRATIONS = "Aspirations"
 
 
@@ -76,51 +76,42 @@ def read_all(tab_name: str) -> list[dict]:
 
 # ── High-level write helpers ───────────────────────────────────────────────────
 
-def get_last_target_wake_time() -> str:
-    """Retrieves the target wake-up time set in the most recent Daily entry."""
-    records = read_all(TAB_DAILY)
-    if not records:
-        return ""
-    # Find the latest record with a set target_wake_time
-    for record in reversed(records):
-        target = record.get("target_wake_time")
-        if target:
-            return str(target)
-    return ""
-    
 def write_daily(data: dict) -> None:
     ss = get_spreadsheet()
-    # ADD THIS LINE: Define the worksheet 'ws' before using it below
     ws = get_or_create_tab(ss, TAB_DAILY)
-    
+
     headers = [
-        "date", "sleep_hours", "supplements", "morning_routine", "nightly_routine",
+        "date", "sleep_hours", "isaac_gratitude", "madison_gratitude",
+        "supplements", "psychoactive_compounds", "morning_routine", "nightly_routine",
         "chess_min", "fitness_min", "research_min", "music_min",
         "arts_min", "industrial_min", "cooking_min",
-        "autodidactic_min", "languages_min", "framework_min"
+        "autodidactic_min", "languages_min", "framework_min",
     ]
-    
-    # Now 'ws' is defined and can be passed to ensure_header
-    ensure_header(ws, headers)
-    row = [data.get(h, "") for h in headers]
+
+    existing_headers = ws.row_values(1)
+    if not existing_headers:
+        ws.append_row(headers)
+        existing_headers = headers
+    else:
+        # Preserve existing columns/data while adding any newly introduced fields.
+        missing_headers = [h for h in headers if h not in existing_headers]
+        if missing_headers:
+            existing_headers = existing_headers + missing_headers
+            ws.update("1:1", [existing_headers])
+
+    row = [data.get(h, "") for h in existing_headers]
     ws.append_row(row, value_input_option="USER_ENTERED")
-
-
-# sheets.py
-
-# utils/sheets.py
 
 
 def write_domain(tab_name: str, headers: list[str], data: dict) -> None:
     ss = get_spreadsheet()
-    # Ensure the worksheet is defined as 'ws'
-    ws = get_or_create_tab(ss, tab_name) 
-    
-    # Now ws is defined and can be passed to ensure_header
+    ws = get_or_create_tab(ss, tab_name)
+
     ensure_header(ws, ["date"] + headers)
-    
+
     row = [str(date.today())] + [data.get(h, "") for h in headers]
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 def update_aspiration_status(title: str, new_status: str) -> bool:
     """Finds an aspiration by title and updates its Status cell."""
@@ -129,15 +120,13 @@ def update_aspiration_status(title: str, new_status: str) -> bool:
         ws = ss.worksheet(TAB_ASPIRATIONS)
         records = ws.get_all_records()
         headers = ws.row_values(1)
-        
+
         if "Title" not in headers or "Status" not in headers:
             return False
-            
-        title_col_idx = headers.index("Title")
-        status_col_idx = headers.index("Status") + 1 # 1-based index
-        
+
+        status_col_idx = headers.index("Status") + 1  # 1-based index
+
         for idx, row in enumerate(records):
-            # ws.get_all_records() shifts row references down by 2 (1 for header, 1 for 0-indexing)
             if str(row.get("Title")).strip() == str(title).strip():
                 row_to_update = idx + 2
                 ws.update_cell(row_to_update, status_col_idx, new_status)
