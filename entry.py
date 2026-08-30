@@ -1,6 +1,6 @@
 """
 pages/entry.py — Arthur Fairfax · 3-step daily data entry flow.
-Step 1: Sleep / Supplements / Routines
+Step 1: Sleep / Gratitude / Supplements / Psychoactive Compounds / Routines
 Step 2: Time per domain (pre-filled from Google Calendar)
 Step 3: Arete — Domain-specific metrics & cultural consumption
 """
@@ -45,29 +45,17 @@ def _reset():
 
 def _step1():
     st.markdown("## Step 1 of 3 — General Health")
-    st.markdown("*Sleep, supplements, and routines from last night / this morning.*")
+    st.markdown("*Sleep, gratitude, supplements, psychoactive compounds, and routines from last night / today.*")
     st.markdown("---")
-
-    # --- Target Wake Up Check from Yesterday ---
-    last_target = sheets.get_last_target_wake_time()
-    met_target = "N/A"
-    if last_target:
-        st.markdown(f"#### 🎯 Target Wake-Up Time Check")
-        met_target = st.radio(
-            f"Your target wake-up time was **{last_target}**. Did you hit it today?",
-            ["Yes", "No"],
-            horizontal=True
-        )
-        st.markdown("---")
 
     col1, col2 = st.columns(2)
     with col1:
         bedtime = st.time_input("🌙 Time you went to sleep", value=time(23, 0))
     with col2:
-        wakeup  = st.time_input("☀️ Time you woke up", value=time(7, 0))
+        wakeup = st.time_input("☀️ Time you woke up", value=time(7, 0))
 
     # Calculate sleep hours (handles crossing midnight)
-    bed_dt  = datetime.combine(date.today(), bedtime)
+    bed_dt = datetime.combine(date.today(), bedtime)
     wake_dt = datetime.combine(date.today(), wakeup)
     if wake_dt < bed_dt:
         from datetime import timedelta
@@ -75,9 +63,34 @@ def _step1():
     sleep_hours = round((wake_dt - bed_dt).total_seconds() / 3600, 2)
     st.info(f"⏱️ Calculated sleep: **{sleep_hours} hours**")
 
+    st.markdown("#### 🙏 Daily Gratitude")
+    st.caption("Optional — a quick note from each of you.")
+    gratitude_col1, gratitude_col2 = st.columns(2)
+    with gratitude_col1:
+        isaac_gratitude = st.text_area(
+            "Isaac",
+            placeholder="Something you're grateful for today…",
+            height=90,
+            key="isaac_gratitude",
+        )
+    with gratitude_col2:
+        madison_gratitude = st.text_area(
+            "Madison",
+            placeholder="Something you're grateful for today…",
+            height=90,
+            key="madison_gratitude",
+        )
+
     st.markdown("#### Supplements taken today")
-    supplement_options = ["Creatine", "Caffeine", "THC", "L-Theanine", "Ashwagandha", "Minoxidil"]
-    supplements = st.multiselect("Select all that apply", supplement_options)
+    supplement_options = ["Creatine", "Vitamin D", "L-Theanine", "Magnesium"]
+    supplements = st.multiselect("Select all supplements that apply", supplement_options)
+
+    st.markdown("#### Psychoactive compounds used today")
+    psychoactive_options = ["Kanna", "Caffeine", "Ethanol", "THC", "Nicotine", "Kava"]
+    psychoactive_compounds = st.multiselect(
+        "Select all psychoactive compounds that apply",
+        psychoactive_options,
+    )
 
     st.markdown("#### Routines")
     col3, col4 = st.columns(2)
@@ -87,21 +100,19 @@ def _step1():
         nightly_routine = st.radio("Nightly routine completed?", ["Yes", "No"], horizontal=True)
 
     st.markdown("---")
-    st.markdown("#### ⏰ Tomorrow's Target")
-    target_wake_time = st.time_input("Target wake-up time for tomorrow", value=time(7, 0))
-
-    st.markdown("---")
     if st.button("Continue →", use_container_width=True):
         st.session_state.step1_data = {
-            "sleep_hours":          sleep_hours,
-            "supplements":          ", ".join(supplements) if supplements else "None",
-            "morning_routine":      morning_routine,
-            "nightly_routine":      nightly_routine,
-            "met_target_wake_time": met_target,
-            "target_wake_time":     target_wake_time.strftime("%I:%M %p"),
+            "sleep_hours": sleep_hours,
+            "isaac_gratitude": isaac_gratitude.strip(),
+            "madison_gratitude": madison_gratitude.strip(),
+            "supplements": ", ".join(supplements) if supplements else "None",
+            "psychoactive_compounds": ", ".join(psychoactive_compounds) if psychoactive_compounds else "None",
+            "morning_routine": morning_routine,
+            "nightly_routine": nightly_routine,
         }
         _next_step()
         st.rerun()
+
 
 def _step2():
     st.markdown("## Step 2 of 3 — Time Spent per Domain")
@@ -142,9 +153,6 @@ def _step2():
             _next_step()
             st.rerun()
 
-# entry.py
-
-# [ ... Step 1 and Step 2 remain as they are ... ]
 
 def _step3():
     st.markdown("## Step 3 of 3 — Arete")
@@ -155,15 +163,15 @@ def _step3():
     domain_data: dict[str, dict] = {}
 
     LABOR_CATEGORIES = {
-        "research":     ["Bench", "Coursework", "Literature"],
-        "music":        ["Technique", "Creation", "Teaching", "DAW"],
-        "arts":         ["Visual Arts", "Photography", "Poetry"],
-        "languages":    ["German", "Spanish", "Russian"],
+        "research": ["Bench", "Coursework", "Literature"],
+        "music": ["Technique", "Creation", "Teaching", "DAW"],
+        "arts": ["Visual Arts", "Photography", "Poetry"],
+        "languages": ["German", "Spanish", "Russian"],
         "autodidactic": ["Reading", "Writing", "Criticism"],
-        "cooking":      ["Old", "New", "Hosting"],
-        "fitness":      ["Yoga", "Upper Body: Push", "Upper Body: Pull", "Lower Body", "TotF", "Cardio"],
-        "industrial":   ["Gardening", "Restoration", "Construction", "Engineering", "Business"],
-        "framework":    ["Financial", "Planning", "Code", "Cleaning/Organizing"]
+        "cooking": ["Old", "New", "Hosting"],
+        "fitness": ["Yoga", "Upper Body: Push", "Upper Body: Pull", "Lower Body", "TotF", "Cardio"],
+        "industrial": ["Gardening", "Restoration", "Construction", "Engineering", "Business"],
+        "framework": ["Financial", "Planning", "Code", "Cleaning/Organizing"],
     }
 
     for domain in active_domains:
@@ -182,11 +190,11 @@ def _step3():
         st.markdown("*Select all kinds of cultural products consumed today.*")
 
         CULTURAL_TYPES = {
-            "film":       ("🎬", "Film",        "Title of film watched"),
-            "tv":         ("📺", "TV Series",   "Title of series watched"),
-            "book":       ("📖", "Book",        "Title of book read"),
-            "music":      ("🎵", "Music",       "Artist / album / song listened to"),
-            "restaurant": ("🍽️", "Restaurant",  "Name of restaurant visited"),
+            "film": ("🎬", "Film", "Title of film watched"),
+            "tv": ("📺", "TV Series", "Title of series watched"),
+            "book": ("📖", "Book", "Title of book read"),
+            "music": ("🎵", "Music", "Artist / album / song listened to"),
+            "restaurant": ("🍽️", "Restaurant", "Name of restaurant visited"),
         }
 
         selected_types = st.multiselect(
@@ -208,9 +216,19 @@ def _step3():
             for idx in range(st.session_state[f"cult_{ct}_count"]):
                 c1, c2 = st.columns([3, 1])
                 with c1:
-                    title = st.text_input(f"Title #{idx+1}", placeholder=placeholder, key=f"cult_{ct}_{idx}_t", label_visibility="collapsed")
+                    title = st.text_input(
+                        f"Title #{idx+1}",
+                        placeholder=placeholder,
+                        key=f"cult_{ct}_{idx}_t",
+                        label_visibility="collapsed",
+                    )
                 with c2:
-                    reviewed = st.selectbox("Review?", ["No", "Yes"], key=f"cult_{ct}_{idx}_r", label_visibility="collapsed")
+                    reviewed = st.selectbox(
+                        "Review?",
+                        ["No", "Yes"],
+                        key=f"cult_{ct}_{idx}_r",
+                        label_visibility="collapsed",
+                    )
                 if title:
                     cultural_entries.append({"type": label, "title": title, "review_left": reviewed})
 
@@ -239,13 +257,14 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
         try:
             # 1. Daily summary row
             daily_row = {
-                "date":                 today,
-                "sleep_hours":          s1.get("sleep_hours", ""),
-                "supplements":          s1.get("supplements", ""),
-                "morning_routine":      s1.get("morning_routine", ""),
-                "nightly_routine":      s1.get("nightly_routine", ""),
-                "target_wake_time":     s1.get("target_wake_time", ""),
-                "met_target_wake_time": s1.get("met_target_wake_time", ""),
+                "date": today,
+                "sleep_hours": s1.get("sleep_hours", ""),
+                "isaac_gratitude": s1.get("isaac_gratitude", ""),
+                "madison_gratitude": s1.get("madison_gratitude", ""),
+                "supplements": s1.get("supplements", ""),
+                "psychoactive_compounds": s1.get("psychoactive_compounds", ""),
+                "morning_routine": s1.get("morning_routine", ""),
+                "nightly_routine": s1.get("nightly_routine", ""),
             }
             for domain in ALL_DOMAINS:
                 daily_row[f"{domain}_min"] = s2.get(domain, 0)
@@ -262,18 +281,18 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
 
             # 3. Domain-specific rows
             tab_map = {
-                "chess":         (sheets.TAB_CHESS,      []),
-                "fitness":       (sheets.TAB_FITNESS,    ["labor_type"]),
-                "research":      (sheets.TAB_RESEARCH,   ["labor_type"]),
-                "music":         (sheets.TAB_MUSIC,      ["labor_type"]),
-                "arts":          (sheets.TAB_ARTS,       ["labor_type"]),
-                "cooking":       (sheets.TAB_COOKING,    ["labor_type"]),
-                "languages":     (sheets.TAB_LANG,       ["labor_type"]),
-                "industrial":    (sheets.TAB_INDUSTRIAL, ["labor_type"]),
-                "autodidactic":  (sheets.TAB_AUTODID,    ["labor_type"]),
-                "framework":     (sheets.TAB_FRAMEWORK,  ["labor_type"]),
+                "chess": (sheets.TAB_CHESS, []),
+                "fitness": (sheets.TAB_FITNESS, ["labor_type"]),
+                "research": (sheets.TAB_RESEARCH, ["labor_type"]),
+                "music": (sheets.TAB_MUSIC, ["labor_type"]),
+                "arts": (sheets.TAB_ARTS, ["labor_type"]),
+                "cooking": (sheets.TAB_COOKING, ["labor_type"]),
+                "languages": (sheets.TAB_LANG, ["labor_type"]),
+                "industrial": (sheets.TAB_INDUSTRIAL, ["labor_type"]),
+                "autodidactic": (sheets.TAB_AUTODID, ["labor_type"]),
+                "framework": (sheets.TAB_FRAMEWORK, ["labor_type"]),
             }
-            
+
             for domain, dd in domain_data.items():
                 if domain in tab_map:
                     tab, headers = tab_map[domain]
@@ -285,6 +304,7 @@ def _submit(domain_data: dict, cultural_entries: list | None = None):
 
         except Exception as e:
             st.error(f"Error writing to Google Sheets: {e}")
+
 
 # ── Main render ────────────────────────────────────────────────────────────────
 
@@ -304,6 +324,9 @@ def render():
             )
     st.markdown("<br>", unsafe_allow_html=True)
 
-    if   step == 1: _step1()
-    elif step == 2: _step2()
-    elif step == 3: _step3()
+    if step == 1:
+        _step1()
+    elif step == 2:
+        _step2()
+    elif step == 3:
+        _step3()
