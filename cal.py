@@ -11,19 +11,13 @@ from typing import Optional
 
 import streamlit as st
 
-# Domain keyword mapping — extend freely
+# Only the four calendar-based domains are classified here. The six habit\n# domains are recorded by checkboxes in entry.py instead.
 
 DOMAIN_KEYWORDS: dict[str, list[str]] = {
-    "chess":          ["chess", "lichess", "chess.com"],
-    "fitness":        ["gym", "fitness", "run", "yoga", "lift", "workout", "crossfit", "swim", "bike", "training"],
-    "research":       ["research", "lab", "experiment", "paper", "grant", "fellowship", "conference", "poster"],
     "music":          ["music", "guitar", "piano", "practice", "jam", "rehearsal", "gig"],
     "arts":           ["art", "paint", "draw", "sketch", "studio", "sculpture", "photography", "poetry"],
     "industrial":     ["gardening", "industrial", "restoration", "construction", "engineering", "business"], # Changed from gardening
-    "cooking":        ["cook", "cooking", "meal prep", "bake", "recipe", "kitchen"],
     "framework":      ["framework"], # Added new domain
-    "autodidactic":   ["reading", "autodidactic", "writing", "criticism", "video", "publishing"], # Updated keywords
-    "languages":      ["spanish", "french", "german", "japanese", "mandarin", "duolingo", "anki", "language", "languages"],
 }
 
 TOKEN_PATH = Path("/tmp/gcal_token.pkl")
