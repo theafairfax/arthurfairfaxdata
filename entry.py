@@ -82,11 +82,11 @@ def _step1():
         )
 
     st.markdown("#### Supplements taken today")
-    supplement_options = ["Creatine", "Vitamin D", "L-Theanine", "Magnesium"]
+    supplement_options = ["Creatine", "Vitamin D", "L-Theanine", "Magnesium", "Ashwagandha"]
     supplements = st.multiselect("Select all supplements that apply", supplement_options)
 
     st.markdown("#### Psychoactive compounds used today")
-    psychoactive_options = ["Kanna", "Caffeine", "Ethanol", "THC", "Nicotine", "Kava"]
+    psychoactive_options = ["Kanna", "Caffeine", "Ethanol", "THC", "Nicotine", "Kava", "Psilocybin"]
     psychoactive_compounds = st.multiselect(
         "Select all psychoactive compounds that apply",
         psychoactive_options,
@@ -114,14 +114,34 @@ def _step1():
         st.rerun()
 
 
+# Each completed habit credits a fixed number of minutes to its domain.
+# These six domains intentionally bypass calendar classification entirely.
+HABIT_MINUTES = {
+    "chess": [("Played chess today?", 10)],
+    "fitness": [("Exercised today?", 45)],
+    "cooking": [("Cooked a meal today?", 30)],
+    "autodidactic": [
+        ("Read a book today?", 30),
+        ("Listened to a lecture today?", 30),
+    ],
+    "languages": [("Used a language app today?", 5)],
+    "research": [("Standard workday today?", 420)],
+}
+
+
 def _step2():
     st.markdown("## Step 2 of 3 — Time Spent per Domain")
-    st.markdown("*Values pre-filled from Google Calendar. Edit anything that looks off.*")
+    st.markdown(
+        "*Check off daily habits to automatically credit their minutes. "
+        "The other four domains are pre-filled from Google Calendar. "
+        "You can override any total.*"
+    )
     st.markdown("---")
 
-    # Pull calendar data (cached per session)
+    # Only the calendar-based domains are fetched. The habits never consult
+    # Calendar, preventing double counting between the two sources.
     if "cal_minutes" not in st.session_state:
-        with st.spinner("Fetching your Google Calendar…"):
+        with st.spinner("Fetching calendar-based domain time…"):
             st.session_state.cal_minutes = fetch_today_domain_minutes()
 
     cal = st.session_state.cal_minutes
@@ -130,16 +150,45 @@ def _step2():
     cols = st.columns(2)
     for i, domain in enumerate(ALL_DOMAINS):
         label = f"{DOMAIN_ICONS[domain]} {DOMAIN_LABELS[domain]}"
-        default = cal.get(domain, 0)
         with cols[i % 2]:
-            edited[domain] = st.number_input(
-                f"{label} (min)",
-                min_value=0,
-                max_value=1440,
-                value=default,
-                step=5,
-                key=f"time_{domain}",
-            )
+            st.markdown(f"**{label}**")
+            if domain in HABIT_MINUTES:
+                habit_total = 0
+                for habit_index, (question, minutes) in enumerate(HABIT_MINUTES[domain]):
+                    if st.checkbox(
+                        question,
+                        key=f"habit_{domain}_{habit_index}",
+                        help=f"Adds {minutes} minutes",
+                    ):
+                        habit_total += minutes
+                # Separate enabled override and number input avoid stale widget
+                # values when checkboxes are checked/unchecked.
+                override = st.checkbox(
+                    "Override calculated minutes",
+                    key=f"override_{domain}",
+                )
+                if override:
+                    if f"manual_{domain}" not in st.session_state:
+                        st.session_state[f"manual_{domain}"] = habit_total
+                    edited[domain] = int(st.number_input(
+                        f"{DOMAIN_LABELS[domain]} — manual minutes",
+                        min_value=0,
+                        max_value=1440,
+                        step=5,
+                        key=f"manual_{domain}",
+                    ))
+                else:
+                    edited[domain] = habit_total
+                    st.caption(f"Total: {habit_total} min")
+            else:
+                edited[domain] = int(st.number_input(
+                    f"{DOMAIN_LABELS[domain]} — minutes from Calendar",
+                    min_value=0,
+                    max_value=1440,
+                    value=int(cal.get(domain, 0)),
+                    step=5,
+                    key=f"time_{domain}",
+                ))
 
     st.markdown("---")
     col_back, col_fwd = st.columns([1, 3])
@@ -166,10 +215,10 @@ def _step3():
         "research": ["Bench", "Coursework", "Literature"],
         "music": ["Technique", "Creation", "Teaching", "DAW"],
         "arts": ["Visual Arts", "Photography", "Poetry"],
-        "languages": ["German", "Spanish", "Russian"],
+        "languages": ["German", "Spanish", "Russian", "Arabic"],
         "autodidactic": ["Reading", "Writing", "Criticism"],
         "cooking": ["Old", "New", "Hosting"],
-        "fitness": ["Yoga", "Upper Body: Push", "Upper Body: Pull", "Lower Body", "TotF", "Cardio"],
+        "fitness": ["Yoga", "Upper Body: Push", "Upper Body: Pull", "Lower Body", "TotF", "Cardio", "Basketball", "Soccer"],
         "industrial": ["Gardening", "Restoration", "Construction", "Engineering", "Business"],
         "framework": ["Financial", "Planning", "Code", "Cleaning/Organizing"],
     }
