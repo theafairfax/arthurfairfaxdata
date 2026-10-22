@@ -1,0 +1,7 @@
+# Never commit local Streamlit credentials or environment files
+.streamlit/secrets.toml
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
