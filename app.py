@@ -54,6 +54,41 @@ div[data-testid="stSidebar"] {
 </style>
 """, unsafe_allow_html=True)
 
+# ── Password gate: no navigation, modules, or sheet reads before login ─────────
+# Configure APP_PASSWORD in Streamlit Community Cloud → App settings → Secrets.
+import hmac
+
+def require_login() -> None:
+    try:
+        expected = st.secrets["APP_PASSWORD"]
+    except (KeyError, FileNotFoundError):
+        st.error("App password is not configured. Add APP_PASSWORD to Streamlit Secrets.")
+        st.stop()
+
+    if not isinstance(expected, str) or not expected:
+        st.error("APP_PASSWORD must be a non-empty string in Streamlit Secrets.")
+        st.stop()
+
+    if st.session_state.get("authenticated", False):
+        return
+
+    # Only the sign-in form is displayed before authentication.
+    st.markdown("## ⚔️ Arthur Fairfax")
+    st.markdown("Enter the password to access the application.")
+    with st.form("login_form"):
+        password = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Unlock")
+    if submitted:
+        if hmac.compare_digest(password, expected):
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
+    st.stop()
+
+
+require_login()
+
 # ── Sidebar navigation ─────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## ⚔️ Arthur Fairfax")
@@ -65,6 +100,9 @@ with st.sidebar:
     )
     st.markdown("---")
     st.caption("Data lands in your Google Sheet.\nXP = hours logged since inception.")
+    if st.button("Log out"):
+        st.session_state.authenticated = False
+        st.rerun()
 
 # ── Route ─────────────────────────────────────────────────────────────────────
 if page == "🗺️ Arete":
